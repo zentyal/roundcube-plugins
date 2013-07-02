@@ -1,0 +1,40 @@
+//compile 0a1a5a5d8ee6affa8ab79b4be4d87ea8
+function planner_drag_events(){
+  var $list = $('#planner_items'),
+  $calendar_icon = $('#calendar_button');
+
+  $("li.drag_datetime", $list).draggable({
+    cancel: "a.ui-icon",
+    revert: "invalid",
+    containment: "window",
+    scroll: false,
+    helper: "clone",
+    cursor: "move",
+    appendTo: '#planner_drag_list',
+    zIndex: 999999
+  });
+  
+  var classactive = 'ui-stat-highlight';
+  if(rcmail.env.skin == 'larry')
+    classactive = 'buttonborder';
+  
+  $calendar_icon.droppable({
+    accept: "#planner_items_list > li.drag_datetime",
+    activeClass: classactive,
+    tolerance: "touch",
+    drop: function(event,ui){
+      planner_overlay_toggle(true);
+      var text = ui.draggable.find('.datetime').text();
+      var summary = text;
+      if(summary.length >= 25){
+        summary = summary.substr(0,22) + '...';
+      }
+      var color = 'default';
+      var id = ui.draggable.find('.drag_id').val();
+      var date = ui.draggable.find('.datetime').prev().prev().val();
+      rcmail.http_post('plugin.newEvent', '_summary=' + summary + '&_description=' + text + '&_color=' + color + '&_planner_datetime=' + date + '&_id=' + id);
+      $('#overlay').show();
+      $('#planner_help').hide();
+    }
+  });
+}

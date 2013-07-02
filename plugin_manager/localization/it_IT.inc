@@ -1,0 +1,170 @@
+<?php
+/*
+ +-----------------------------------------------------------------------+
+ | ./plugins/plugin_manager/localization/it_IT.inc
+ |
+ | Language file of MyRoundcube Plugins Bundle
+ | Copyright (C) 2010-2012, Roland 'rosali' Liebl
+ | Licensed under the GNU GPL
+ |
+ +-----------------------------------------------------------------------+
+ | Author: Roberto - 11/05/2012 14:56:52
+ +-----------------------------------------------------------------------+
+*/
+
+$labels = array();
+$labels['pluginname'] = 'Gestore Plugin';
+$labels['plugindescription'] = 'Gestore plugin permette agli utenti di abilitare e/o disabilitare i plugin (a livello di account utente) e aiuta gli amministratori a mantenere aggiornato il sistema per ciò che riguarda plugins, bug di sistema, downloads centralizzati, documentazioni e suggerimenti.';
+$labels['plugin_manager_title'] = 'Gestisci i Plugin';
+$labels['plugin_manager_center'] = 'Pannello gestione Plugin';
+$labels['calendaring'] = 'Calendario';
+$labels['misc'] = 'Varie';
+$labels['downloads'] = 'Downloads';
+$labels['issue'] = 'Problemi';
+$labels['submitissue'] = 'Notifica un problema';
+$labels['showall'] = 'Mostra tutti i Plugins';
+$labels['hideuptodate'] = 'Mostra solo gli aggiornamenti';
+$labels['connectionerror'] = 'Il server remoto non risponde al tentativo di connessione';
+$labels['trylater'] = 'Per favore, riprova più tardi...';
+$labels['translate'] = 'Traduci questo Plugin';
+$labels['restoredefaults'] = 'Impostazioni iniziali';
+$labels['checkall'] = 'Seleziona tutti';
+$labels['uncheckall'] = 'Rimuovi tutti';
+$labels['toggle'] = 'Inverti la selezione';
+$labels['status'] = 'Stato';
+$labels['globalplugins'] = 'Plugin globale';
+$labels['backend'] = 'Server di Plugin';
+$labels['messagesmanagement'] = 'Gestione Messaggi';
+$labels['furtherconfig'] = 'Vuoi configurare il plugin adesso?';
+$labels['uninstall'] = 'Stai per disabilitare il plugin. Vuoi rimuovere definitivamente le configurazioni salvate?';
+$labels['uninstallconfirm'] = 'Stai per disabilitare il plugin. ATTENZIONE: Seleziona »DISABILITA« per disabilitare questo plugin e mantenere dati e configurazioni nel nostro server se intendi usare ancora il plugin nel futuro. Seleziona »RIMUOVI« per cancellare definitivamente dati e configurazioni di questo plugin dal nostro database. Quest\'ultima azione non può essere annullata.';
+$labels['areyousure'] = 'Non puoi intraprendere questa azione. Sei veramente sicuro?';
+$labels['successfullydeleted'] = 'Le configurazioni sono state rimosse con successo.';
+$labels['successfullysaved'] = 'Salvato con successo.';
+$labels['errorsaving'] = 'Errore durante il salvataggio.';
+$labels['yes'] = 'Si';
+$labels['no'] = 'No';
+$labels['disable'] = 'Disabilita';
+$labels['remove'] = 'Rimuovi';
+$labels['savewarning'] = 'Vuoi salvare i cambiamenti?';
+$labels['plugin_manager_update'] = 'Aggiorna il gestore di Plugin';
+$labels['authors_comments'] = 'Commento dell\'Autore (non tradotto)';
+$labels['requiredby'] = 'Plugin richiesto da';
+$labels['requires'] = 'Il Plugin richiede';
+$labels['recommended'] = 'Plugin raccomandati';
+$labels['update_plugins'] = 'Aggiorna i Plugin';
+$labels['ziparchive'] = 'Scarica l\'archivio compresso';
+$labels['demoaccount'] = 'Spiacente, download non disponibile (Account Demo)';
+$labels['serverversion'] = 'Versione del Server';
+$labels['mirrorversion'] = 'Versione del Mirror';
+$labels['mirrorhost'] = 'Server di Mirror';
+$labels['comments'] = 'Requisiti e Note di Aggiornamento';
+$labels['update_error'] = 'Versione non corrispondente';
+$labels['update_ok'] = 'È stata rilevata la versione più recente. Nessun aggiornamento necessario.';
+$labels['update_edit'] = 'Il Plugin deve essere riconfigurato o richiede cambiamenti nel database. Per favore leggi le Note di Aggiornamento.';
+$labels['servernewer'] = 'Il Plugin registrato è più nuovo della versione nel Server Mirror.';
+$labels['orhigher'] = 'o successiva';
+$labels['rc_ok'] = 'Il Core di Roundcube è aggiornato.';
+$labels['update_update'] = 'Il Plugin è obsoleto. Per favore aggiornalo! Leggi le Note di Aggiornamento.';
+$labels['noupdates'] = 'Nessun aggiornamento selezionato.';
+$labels['rc_update'] = 'Il Core di Roundcube è obsoleto. Per favore aggiornalo!';
+$labels['rc_uptodate'] = 'Il Core di Roundcube è aggiornato.';
+$labels['rc_newer'] = 'Il Core di Roundcube è più nuovo della versione nel server Mirror!';
+$labels['nottested'] = 'Per favore usa i Plugin con attenzione! Non sappiamo se i Plugin a disposizione funzionano con Roundcube v%s.';
+$labels['justunzip'] = 'Scompatta semplicemente l\'Archivio e sostituisci all\'installazione esistente.';
+$labels['guide'] = 'Ulteriori informazioni...';
+$labels['thirdparty'] = 'Questo non è un Plugin myRoundcube.';
+$labels['thirdpartywarning'] = 'Questo è un Plugin di terze parti. Consigliamo di non scaricare il plugin da questo Server Mirror. Scaricalo dal sito dello sviluppatore per essere sicuro di avere la versione più aggiornata facendo attenzione alle note dello sviluppatore.';
+$labels['develsite'] = 'Scarica';
+$labels['notinstalled'] = 'non installato';
+$labels['notregistered'] = 'non registrato';
+$labels['roundcubeurl'] = 'Scarica Roundcube';
+$labels['languageupdate'] = 'L\'aggiornamento della lingua è disponibile';
+$labels['donotregister'] = 'Non attivare questo Plugin. Viene caricato automaticamente.';
+$labels['register'] = 'Attiva il Plugin in ./config/main.inc.php [$rcmail_config[\'plugins\'] = array("foo", "bar");].';
+$labels['customer_id'] = 'Customer ID';
+$labels['noplugindescription'] = 'Nessuna descrizione del plugin rilevata.';
+$labels['markbuttons_pluginname'] = 'Bottoni di Contrassegno dei Messaggi';
+$labels['markbuttons_plugindescription'] = 'Aggiunge delle icone di controllo sotto la lista dei messaggi per contrassegnare rapidamente i messaggi.';
+$labels['automatic_addressbook_pluginname'] = 'Rubrica automatica';
+$labels['automatic_addressbook_plugindescription'] = 'Raccogli gli indirizzi di posta di tutti i destinatari in una rubrica separata.';
+$labels['keyboard_shortcuts_pluginname'] = 'Scorciatoie da tastiera';
+$labels['keyboard_shortcuts_plugindescription'] = 'Inserisci i comandi utilizzando le scorciatoie da tastiera.';
+$labels['message_highlight_pluginname'] = 'Evidenzia Messaggi';
+$labels['message_highlight_plugindescription'] = 'Evidenzia i messaggi in corrispondenza delle opzioni dei filtri.';
+$labels['fixTHEAD_pluginname'] = 'Fissa Intestazione Lista Messaggi';
+$labels['fixTHEAD_plugindescription'] = 'Fissa l\'intestazione della Lista Messaggi';
+$labels['compose_addressbook_pluginname'] = 'Seleziona Indirizzi';
+$labels['compose_addressbook_plugindescription'] = 'Seleziona indirizzi durante la composizione dei messaggi.';
+$labels['google_contacts_pluginname'] = 'Contatti Google';
+$labels['google_contacts_plugindescription'] = 'Accedi ai tuoi contatti Google';
+$labels['contextmenu_pluginname'] = 'Menu contestuale';
+$labels['contextmenu_plugindescription'] = 'Abilita la funzionalità pulsante destro del mouse nel menu contestuale.';
+$labels['newmail_notifier_pluginname'] = 'Notifica Nuovo Messaggio';
+$labels['newmail_notifier_plugindescription'] = 'Notifica all\'arrivo di un nuovo messaggio.';
+$labels['listcommands_pluginname'] = 'Rispondi alle Liste';
+$labels['listcommands_plugindescription'] = 'Varie opzioni per rispondere ai messaggi inviati dalle liste di discussione.';
+$labels['copymessage_pluginname'] = 'Copia messaggi(o)';
+$labels['copymessage_plugindescription'] = 'Copia messaggi(o) in un\'altra cartella IMAP.';
+$labels['forwardattachment_pluginname'] = 'Inoltra come Allegato';
+$labels['forwardattachment_plugindescription'] = 'Inoltra messaggi multipli come allegati.';
+$labels['vcard_attachments_pluginname'] = 'Allega vCard';
+$labels['vcard_attachments_plugindescription'] = 'Aggiunge in allegato una vCard ai messaggi inviati per permettere ai destinatari l\'archiviazione del proprio contatto nella loro rubrica.';
+$labels['importmessages_pluginname'] = 'Importa Messaggi';
+$labels['importmessages_plugindescription'] = 'Importa messaggi da un file compresso .zip o da una sorgente eml.';
+$labels['zipdownload_pluginname'] = 'Esporta Messaggi';
+$labels['zipdownload_plugindescription'] = 'Esporta i messaggi in un file compresso .zip';
+$labels['markasjunk2_pluginname'] = 'Marca i Messaggi come Posta Indesiderata';
+$labels['markasjunk2_plugindescription'] = 'Marca i Messaggi come Posta Indesiderata e come Posta Non indesiderata';
+$labels['google_ads_pluginname'] = 'Annunci Google';
+$labels['google_ads_plugindescription'] = 'Mostra gli Annunci di Google';
+$labels['google_analytics_pluginname'] = 'Google Analytics';
+$labels['google_analytics_plugindescription'] = 'Includi Google Analytics';
+$labels['globaladdressbook_pluginname'] = 'Rubrica globale';
+$labels['globaladdressbook_plugindescription'] = 'Questa è una rubrica in sola lettura fornita dall\'Amministratore';
+$labels['blockspamsending_pluginname'] = 'Impedisci l\'Invio di Posta Indesiderata';
+$labels['blockspamsending_plugindescription'] = 'Permette l\'invio solo di una quantità definita di messaggi con lo stesso contenuto durante una sessione.';
+$labels['global_config_pluginname'] = 'Gestore Configurazioni';
+$labels['global_config_plugindescription'] = 'Questo è plugin di gestione di configurazioni. Ottimizza il tuo server centralizzando i file di configurazione dei plugin. Rende anche le attività di amministrazione più facili abilitando l\'utilizzo di un solo file di configurazione per tutti i plugin.';
+$labels['jqueryui_pluginname'] = 'jQuery UI';
+$labels['jqueryui_plugindescription'] = 'Libreria javascript jQuery UI';
+$labels['hide_blockquote_pluginname'] = 'Nascondi le citazioni';
+$labels['hide_blockquote_plugindescription'] = 'Nascondi le citazioni when il numero delle linee è maggiore di quello specificato';
+$labels['crawler_pluginname'] = 'Crawler';
+$labels['crawler_plugindescription'] = 'Pagina di contenuto "Fake" per i crawlers';
+$labels['dblog_pluginname'] = 'Log su database';
+$labels['dblog_plugindescription'] = 'Registra i log su un database anziché su un file';
+$labels['global_alias_pluginname'] = 'Global Alias';
+$labels['global_alias_plugindescription'] = 'Un plugin di supporto per risolvere i login tramite alias in indirizzi reali';
+$labels['http_auth_pluginname'] = 'HTTP Authentication ';
+$labels['http_auth_plugindescription'] = 'Plugin che attiva il supporto all\'autenticazione HTTP';
+$labels['impersonate_pluginname'] = 'Impersonate';
+$labels['impersonate_plugindescription'] = 'Tool per amministratori che permettere di eseguire login nei vari accounts attraverso una "master password"';
+$labels['jscolor_pluginname'] = 'Cattura colori';
+$labels['jscolor_plugindescription'] = 'Un plugin che visualizza un "Cattura colori"';
+$labels['tinymce_pluginname'] = 'TinyMCE - HTML Editor';
+$labels['tinymce_plugindescription'] = 'Questo plugin implementa TinyMCE PHP Compressor (http://www.tinymce.com/wiki.php/Compressors:PHP). Inoltre aggiunge la possibilità di configrare TinyMCE senza modificare i file di Roundcube';
+$labels['embed_images_pluginname'] = 'Embed external Images';
+$labels['embed_images_plugindescription'] = 'Incolla immagini esterne nel corpo di un messaggio';
+$labels['lang_sel_pluginname'] = 'Select Language';
+$labels['lang_sel_plugindescription'] = 'Scegli la lingua nella pagina di login';
+$labels['newuser_pluginname'] = 'New User';
+$labels['newuser_plugindescription'] = 'Informa gli amministratori quando un nuovo utente si è registrato attraverso l\'interfaccia webmail e manda un messaggio di benvenuto al nuovo utente al primo login';
+$labels['placeholder_pluginname'] = 'Placeholder Attributes';
+$labels['placeholder_plugindescription'] = 'Aggiungi attributi segnaposto agli elementi input testo e password';
+$labels['qtip_pluginname'] = 'jQueryUI Tool Tips';
+$labels['qtip_plugindescription'] = 'Plugin di supporto per usare jQueryUI';
+$labels['sabredav_pluginname'] = 'SabreDAV';
+$labels['sabredav_plugindescription'] = 'Crea SabreDAV accounts per l\'accesso a un calendario CalDAV quando in Roundcube viene creato un nuovo utente e aggiorna la password associata se viene cambiata';
+$labels['savepassword_pluginname'] = 'Save Passwords';
+$labels['savepassword_plugindescription'] = 'Plugin richiesto da altri plugin';
+$labels['database_attachments_pluginname'] = 'Database Attachments';
+$labels['database_attachments_plugindescription'] = 'Plugin di supporto per gestire gli allegati tramite database';
+$labels['new_user_dialog_pluginname'] = 'New user Dialog';
+$labels['new_user_dialog_plugindescription'] = 'Mostra la finestra gestione identità ai nuovi utenti. Quando un nuovo utente viene creato, questo plugin controlla l\'identità di default e imposta un flag di sessione se questa è incompleta. Un box in sovrimpressione apparirà sullo schermo fino a quando l\'utente non abbia completato l\'inserimento delle informazioni';
+$labels['rcguard_pluginname'] = 'ReCAPTCHA';
+$labels['rcguard_plugindescription'] = 'Forca l\'inseirmento di un CAPTCHA dopo un certo numero di tentativi di login falliti';
+$labels['domain_check_pluginname'] = 'Check Domain';
+$labels['domain_check_plugindescription'] = 'Limita l\'accesso alla Webmail ai domini specificati.';
+
+?>

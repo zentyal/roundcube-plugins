@@ -1,0 +1,15 @@
+/***************************************************************************
+ * This file is part of Roundcube "##PLUGIN##" plugin.              
+ *                                                                 
+ * Your are not allowed to distribute this file or parts of it.    
+ *                                                                 
+ * This file is distributed in the hope that it will be useful,    
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of  
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.          
+ *                                                                 
+ * Copyright (c) 2012 - ##YEAR## Roland 'Rosali' Liebl - all rights reserved
+ * dev-team [at] myroundcube [dot] com
+ * http://myroundcube.com
+ ***************************************************************************/
+
+#upcoming_preview{display:block; border:1px solid #C1DAD7; margin-right:12px; margin-left:12px; background-color:#F6F6F6; overflow:auto;}#rcical{display:none;}

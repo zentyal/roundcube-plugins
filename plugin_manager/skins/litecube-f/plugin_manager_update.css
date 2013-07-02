@@ -1,0 +1,45 @@
+#taskbar .updatepm{
+  z-index: 9999;
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  margin-left: -200px;
+  width: 400px;
+  padding: 3px 3px 3px 3px;
+  border: 1px solid #DEEEFC;
+  background: url(download.png) 5px 1px no-repeat #F2F9FF;
+  text-align: center;
+  font-size: 10px;
+  color: #3F70BA;
+}
+#taskbar .updatepmrequired{
+  z-index: 9999;
+  position: absolute;
+  top: 52px;
+  margin-left: auto;
+  left: 50%;
+  margin-left: -200px;
+  width: 400px;
+  padding: 3px 3px 3px 3px;
+  border: 1px solid #FEEBAB;
+  background: url(download.png) 5px 1px no-repeat #FEF8E1;
+  text-align: center;
+  color: #9E660D;
+  cursor: pointer;
+}
+
+
+#taskbar .myrcerror{
+  z-index: 9999;
+  position: absolute;
+  top: 52px;
+  margin-left: auto;
+  left: 50%;
+  margin-left: -200px;
+  width: 400px;
+  padding: 3px 3px 3px 3px;
+  background-color: #FF6B61;
+  border: 1px solid #FF0800;
+  text-align: center;
+  color: #733737;
+}

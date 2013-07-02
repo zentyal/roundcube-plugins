@@ -1,0 +1,305 @@
+.timeline {
+  position: absolute;
+  left: 59px;
+  border: none;
+  border-top: 1px solid #DC5757;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  z-index: 999;
+}
+
+ul.caltoolbarmenu {
+  margin: -4px 0 -4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.caltoolbarmenu li {
+  font-size: 11px;
+  white-space: nowrap;
+  min-width: 130px;
+  margin: 2px -4px;
+}
+
+ul.caltoolbarmenu li input {
+  vertical-align: middle;
+}
+
+#recurringdialog{
+  position: absolute;
+  padding: 10px;10px;10px;10px;
+  width: 350px;
+  top: 200px;
+  margin-left: -175px;
+  left: 50%;
+  z-index: 5000;
+  background-color:#F6F6F6;
+}
+
+#calprinttable td, th
+{
+  border-width: 1px;
+  border-style: solid;
+}
+
+#calsearchdialog {
+  display: none;
+  background-color: #FAFAFA;
+  color: #333;
+  padding: 5px 0 0 0;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+#calsearchset {
+  display: none;
+  position: absolute;
+  top: 78px;
+  right: 32px;
+  width: 150px;
+  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #999;
+  padding: 4px;
+  z-index: 50000;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 1px 1px 12px #999;
+  -webkit-box-shadow: #999 1px 1px 12px;
+}
+
+.calsearchmatch {
+  color: #CC3333;
+}
+
+.calsearchmatchselected {
+  color: #000;
+}
+
+#calsearchdialog .ui-dialog {
+  padding: 0;
+}
+
+#calsearchdialog table {
+  width: 100%;
+  overflow: hidden;
+}
+
+#calquicksearchbar
+{
+  position: absolute;
+  top: 58px;
+  right: 25px;
+  width: 182px;
+  height: 20px;
+  text-align: right;
+  background: url(images/searchfield.gif) top left no-repeat;
+}
+
+#calquicksearchbar img
+{
+  vertical-align: middle;
+}
+
+#calsearchfilter
+{
+  margin-right: 4px;
+  margin-bottom: 5px;
+  position: absolute;
+  top: 2px;
+  left: 24px;
+  width: 140px;
+  height: 15px;
+  font-size: 11px;
+  padding: 0px;
+  border: none;
+}
+
+#calsearchmod
+{
+ position: absolute;
+ top: 3px;
+ right: 160px;
+}
+
+#calsearchreset
+{
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  text-decoration: none;
+}
+
+#calendaroverlay {
+  display: none;
+  position: absolute;
+  top: 55px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4999;
+  background-color: rgba(0,0,0,0.5) !important;
+  background-color: #F6F6F6;
+  background: url(../../../../skins/classic/images/display/loading.gif) 100px 100px no-repeat;
+  /** IE hacks */
+  filter: alpha(opacity=90);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
+  width: expression(document.documentElement.clientWidth+'px');
+  height: expression(document.documentElement.clientHeight+'px');
+}
+
+#calendar {
+  margin: 0 auto;
+  position: absolute;
+  top: 20px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  overflow: auto;   
+}
+
+#calendar-container {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px; 
+}
+
+#calendar-header {
+  position: absolute;
+  top: 86px;
+  left: 242px;
+  right: 26px;
+  z-index: 1;
+}
+
+#calusernamecontent {
+  font-size: 11px;
+}
+
+#upcoming {
+  margin: 0 auto;
+}
+
+#upcoming-maincontainer {
+  cursor: auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#sectionslist {
+  width: 211px;
+  overflow: hidden;
+}
+
+#prefs-box {
+  left: 221px;
+  right: 5px;
+}
+
+#event li {
+  font-size: 12px;
+}
+
+#rrules span {
+  font-size: 11px;
+}
+
+#rrules td {
+  font-size: 11px;
+}
+
+#rrules a:visited {
+  /*color: #555554;*/
+}
+
+#icsuploadform {
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 60px;
+}
+
+#agendalist {
+  width: 700px;
+}
+
+#print {
+  width: 700px;
+}
+
+.print {
+  margin: 1px;
+}
+
+pre {
+ font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+}
+
+#messagetoolbar {
+  top: 55px;
+  left: 241px;
+}
+
+#toolbar {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+#todaybutton{
+  position: absolute;
+  top: 55px;
+  left: 20px;
+  width: 220px;
+}
+
+#event,
+#calswitch,
+#calfilter {
+  display: none;
+}
+
+.fc-state-highlight {
+  background: #fff;
+}
+
+.ui-state-highlight {
+  background: #ffc;
+  border-color: #ffc;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.ui-widget-header,
+.ui-widget-content {
+  font-weight: normal;
+}
+
+.fc-event-skin {
+  font-size: 9px;
+}
+
+.fc-event-title {
+  font-size: 9px;
+}
+
+.fc-event-description {
+  font-size: 9px;
+}
+
+.fc-event-location {
+  font-size: 9px;
+}
+
+.fc-event-categories {
+  font-size: 9px;
+  font-style: italic; 
+}
+
+.fc-grid .fc-event-time {
+  font-weight: normal;
+}

@@ -1,0 +1,71 @@
+<?php
+/*
+
+IMPORTANT:
+---------
+This file is only an example of how to load plugins with plugin_manager. plugin_manager is designed for Administrators and people with at least basic PHP knowledge.
+If you are not sure how to use it or if you require assistance configuring and running our bundle in your server, please feel free to contact us at:
+
+support@myroundcube.com
+
+Our rates to set it up for you are quite reasonable!
+
+If you rather prefer to do it yourself, here are some tips that may help you while at it.
+
+- Backup your current installation and make sure your plugins and configurations are saved elsewhere before you proceed with your work.
+- Remove or comment out all plugins' configurations that are not present in your Roundcube plugins folder.
+- Make sure that all and each one of the plugins registered by this config file are ready to work. E.g: Plugins may require database adjustments, other configurations, etc.)
+
+Please Note: We are dealing with PHP here. Do not except plug'n play!
+
+*/
+
+/* Admin Account */
+$rcmail_config['plugin_manager_admins'] = array('admin1@mydomain.tld','admin2@mydomain.tld'); // lowercase !!!
+
+/* Show Myroundcube messages
+   Note: Messages will be shown for 'plugin_manager_admins' only.
+         By default these messages are displayed on settings steps.
+         If you want to see these messages on all steps, then set to true
+*/
+$rcmail_config['plugin_manager_show_myrc_messages'] = false;
+
+/* Show update page after login */
+$rcmail_config['plugin_manager_show_updates'] = false;
+ 
+/* Here go your third party plugins you want to show in Plugin Manager Center in addition to default MyRoundcube Third Party Plugins (otpional) */
+$rcmail_config['plugin_manager_third_party_plugins'] = array(
+  //'keyboard_shortcuts' => 'http://code.google.com/p/roundcube-plugins/downloads/list',
+);
+
+/* Here go your plugins which should be active in not authenticated state
+   even if they are disabled in $rcmail_config['plugin_manager_defaults'] */
+$rcmail_config['plugin_manager_unauth'] = array(
+  //'vkeyboard' => true,
+);
+
+/* See config.inc.php.example for configuration examples */
+$rcmail_config['plugin_manager_defaults'] = array(
+  'uisettings' => array(
+  ),
+  'messagescomposition' => array(
+  ),
+   'messagesdisplaying' => array(
+  ),
+  'messagesmanagement' => array(
+  ),
+  'addressbook' => array(
+  ),
+  'settings' => array(
+  ),
+  'calendaring' => array(
+  ),
+  'backend' => array(
+  ),
+  'misc' => array(
+  ),
+  'globalplugins' => array(
+  ),
+);
+
+?>

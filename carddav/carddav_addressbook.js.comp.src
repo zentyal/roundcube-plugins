@@ -1,0 +1,79 @@
+if(window.rcmail){
+  rcmail.addEventListener('init', function(evt){
+    rcmail.enable_command('plugin.carddav-addressbook-sync', true);
+    rcmail.enable_command('plugin.carddav-addressbook-sync-silent', true);
+    rcmail.addEventListener('plugin.carddav_addressbook_message', carddav_addressbook_message);
+    rcmail.addEventListener('plugin.carddav_addressbook_message_silent', carddav_addressbook_message_silent);
+    rcmail.addEventListener('plugin.carddav_addressbook_message_copied', carddav_addressbook_message_copied);
+    rcmail.register_command('plugin.carddav-addressbook-sync', function(){
+      $('#carddavsyncbut').removeClass('carddavsync');
+      $('#carddavsyncbut').addClass('carddavloading');
+      rcmail.http_post(
+        'plugin.carddav-addressbook-sync',
+        '',
+        rcmail.display_message(rcmail.gettext('addressbook_sync_loading', 'carddav'), 'loading')
+      );
+    }, true);
+    rcmail.register_command('plugin.carddav-addressbook-sync-silent', function(){
+      $('#carddavsyncbut').removeClass('carddavsync');
+      $('#carddavsyncbut').addClass('carddavloading');
+      rcmail.http_post(
+        'plugin.carddav-addressbook-sync',
+        '_silent=1'
+      );
+    }, true);
+  });
+
+  function carddav_addressbook_message(response){
+    $('.syncwarning').attr('title', '');
+    $('.syncwarning').removeClass('syncwarning');
+    $('#carddavsyncbut').addClass('carddavsync');
+    $('#carddavsyncbut').removeClass('carddavloading');
+    if (response.check){
+      $('li.selected').children().trigger('click');
+      rcmail.display_message(response.message, 'confirmation');
+    }
+    else{
+      if(response.failure){
+        for(var i in response.failure){
+          $('#rcmli' + response.failure[i]).children().addClass('syncwarning');
+          $('#rcmli' + response.failure[i]).children().attr('title', new Date().toLocaleString() + ': ' + response.message);
+        }
+      }
+      rcmail.display_message(response.message, 'error');
+    }
+  }
+  
+  function carddav_addressbook_message_silent(response){
+    if(rcmail.env.task == 'addressbook'){
+      $('#carddavsyncbut').addClass('carddavsync');
+      $('#carddavsyncbut').removeClass('carddavloading');
+      if (response.check){
+        rcmail.display_message(response.message, 'confirmation');
+      }
+      else{
+        rcmail.display_message(response.message, 'error');
+      }
+    }
+  }
+  
+  function carddav_addressbook_message_copied(response){
+    $('li.selected').children().trigger('click');
+    $('#message .notice').remove();
+    rcmail.display_message(response.message, 'notice');
+  }
+  
+  function carddav_addressbook_trigger_sync(){
+    rcmail.command('plugin.carddav-addressbook-sync-silent');
+    window.setTimeout('carddav_addressbook_trigger_sync()', 1000 * 60 * parseInt(rcmail.env.sync_carddavs_interval));
+  }
+  
+  if(rcmail.env.sync_carddavs_interval && parseInt(rcmail.env.sync_carddavs_interval) != 0){
+    //window.setTimeout('carddav_addressbook_trigger_sync()', 1000 * 6 * parseInt(rcmail.env.sync_carddavs_interval));
+    if(((rcmail.env.task == 'mail' && rcmail.env.action == '') || rcmail.env.task == 'addressbook') && rcmail.env.framed != true){
+      $(document).ready(function(){
+        window.setTimeout('carddav_addressbook_trigger_sync();', 1000 * 5);
+      });
+    }
+  }
+}

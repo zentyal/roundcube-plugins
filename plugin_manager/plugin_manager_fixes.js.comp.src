@@ -1,0 +1,46 @@
+$(document).ready(function(){
+  // cancel file upload via drag & drop
+  var avoidFU = avoidFU || {};
+  (function(){
+    var dropContainer;
+    avoidFU.setup = function () {
+      dropContainer = document.getElementsByTagName('body')[0];
+      dropContainer.addEventListener("dragenter", function(event){
+        event.stopPropagation();
+        event.preventDefault();
+      }, false);
+      dropContainer.addEventListener("dragleave", function(event){
+      }, false);
+      dropContainer.addEventListener("dragover", function(event){
+        event.stopPropagation();
+        event.preventDefault();
+      }, false);
+      dropContainer.addEventListener("drop", function(event){
+        event.stopPropagation();
+        event.preventDefault();
+      }, false);
+    }
+    try{
+      window.addEventListener("load", avoidFU.setup, false);
+    }
+    catch(e){
+    }
+  })();
+  
+  // remove texts from toolbar links
+  if(window.rcmail && rcmail.env.skin != 'larry'){
+    $('.markasjunk2').text('');
+    $('.markasnotjunk2').text('');
+    $('body').bind('click keypress', function(){
+      $('.markasnotjunk2').text('');
+    });
+  }
+
+  // logo click
+  if(rcmail.env.skin == 'larry'){
+    $('#toplogo').click(function(){
+      document.location.href = './?_task=mail&_mbox=INBOX';
+    });
+    $('#toplogo').attr('style', 'cursor: pointer');
+  }
+});

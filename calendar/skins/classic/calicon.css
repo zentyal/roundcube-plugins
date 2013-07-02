@@ -1,0 +1,76 @@
+#taskbar a.button-calendar {
+  background: url(images/calendar.png) 0px 4px no-repeat;
+}
+
+input.protected_category {
+  background-color: #B9C4F2;
+}
+
+#caltoday,
+#calback,
+#calforward {
+  cursor: auto;
+}
+
+#caltoday a:link {
+  text-decoration:none;
+}
+
+#caltoday a:visited {
+  text-decoration:none;
+}
+
+#calback a:link {
+  text-decoration:none;
+}
+
+#calback a:visited {
+  text-decoration:none;
+}
+
+#calforward a:link {
+  text-decoration:none;
+}
+
+#calforward a:visited {
+  text-decoration:none;
+}
+
+#upcoming-content {
+  position: absolute;
+  bottom: 44px;
+  left: 20px;
+  border: 1px solid #999999;
+  background-color: #F6F6F6;
+  cursor: auto;
+}
+
+#upcoming-container {
+  position: absolute;
+  top: 20px;
+  bottom: 0px;
+  left: 0px;
+  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#upcoming {
+  margin: 0 auto;
+  border: solid 1px #b3b2b2;
+}
+
+#upcoming_1 {
+  margin: 0 auto;
+  border: solid 1px #b3b2b2;
+}
+
+#upcoming_2 {
+  margin: 0 auto;
+  border: solid 1px #b3b2b2;
+}
+
+#upcoming_preview pre {
+  font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}

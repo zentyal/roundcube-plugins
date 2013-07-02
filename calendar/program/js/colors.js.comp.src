@@ -1,0 +1,61 @@
+function d2h(d) {return d.toString(16);}
+function h2d(h) {return parseInt(h,16);}
+
+function darker(hex, factor){
+  hex = hex.replace('#','').toUpperCase();
+  var new_hex = '';
+  var amount;
+  var v;
+  var new_decimal;
+  var new_hex_component;
+  var new_hex = '';
+  var base = new Array();
+  base['R'] = h2d(hex.substr(0,1) + hex.substr(1,1)); 
+  base['G'] = h2d(hex.substr(2,1) + hex.substr(3,1)); 
+  base['B'] = h2d(hex.substr(4,1) + hex.substr(5,1));
+  for (var k in base)
+  {
+    v = base[k];
+    amount = v / 100;
+    amount = Math.round(amount * factor);
+    new_decimal = v - amount;
+    
+    new_hex_component = d2h(new_decimal);
+    if(new_hex_component.length < 2)
+    {
+      new_hex_component = "0" + new_hex_component;
+    }
+    new_hex = new_hex + new_hex_component;
+  }
+  return new_hex;
+}
+
+function lighter(hex, factor){
+  hex = hex.replace('#','').toUpperCase();
+  var new_hex = '';
+  var amount;
+  var v;
+  var new_decimal;
+  var new_hex_component;
+  var new_hex = '';
+  var base = new Array();
+  base['R'] = h2d(hex.substr(0,1) + hex.substr(1,1)); 
+  base['G'] = h2d(hex.substr(2,1) + hex.substr(3,1)); 
+  base['B'] = h2d(hex.substr(4,1) + hex.substr(5,1));
+  for (var k in base)
+  {
+    v = base[k];
+    amount = 255 - v;
+    amount = amount / 100;
+    amount = Math.round(amount * factor);
+    new_decimal = v + amount;
+    
+    new_hex_component = d2h(new_decimal);
+    if(new_hex_component.length < 2)
+    {
+      new_hex_component = "0" + new_hex_component;
+    }
+    new_hex = new_hex + new_hex_component;
+  }
+  return new_hex;
+}

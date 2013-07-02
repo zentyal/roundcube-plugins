@@ -1,0 +1,153 @@
+/* calendar reminders */
+
+function calendar_reminders(){
+  this.msgids = new Array();
+  this.schedule = function(){
+    rcmail.enable_command('send-attachment',false);
+    $('#attachment-form .mainaction').prop('disabled', true);
+    $('#remindersloading').html('<span class="smallreminders"align="center">' + rcmail.gettext('remindersloading','calendar') + '</span>');
+    $('#remindersloading').show();
+    if(rcmail.env.task != 'login' && rcmail.env.task != 'logout'){
+      rcmail.http_request('plugin.calendar_get_reminders');
+    }
+  }
+  this.remove = function(id, event_id){
+    if(this.msgids.length > 0)
+      return;
+    if(!id){
+      this.msgids[this.msgids.length] = rcmail.set_busy(true,'loading');
+      rcmail.http_post('plugin.calendar_delete_reminders', '');
+      return;
+    }
+    for(var i=1; i<5; i++){
+      $("#rtr" + i + id).remove();
+    }
+    if($("#reminders li").size() == 0){
+      $('#remindersoverlay').hide();
+      $('#remindersoverlaysmall').hide();
+    }
+    $("#reminderscount").html($("#reminders li").size());
+    this.msgids[this.msgids.length] = rcmail.set_busy(true,'loading');
+    rcmail.http_post('plugin.calendar_delete_reminder', '_id=' + id + '&_event_id=' + event_id);
+  }
+  this.display = function(response){
+    for(var i in calendar_reminders.msgids){
+      rcmail.set_busy(false,'loading', calendar_reminders.msgids[i]);
+    }
+    calendar_reminders.msgids = new Array();
+    rcmail.enable_command('send-attachment',true);
+    $('#remindersloading').hide();
+    window.setTimeout('calendar_reminders.schedule()', 1000 * 60);
+    $('#attachment-form .mainaction').prop('disabled', false);
+    if(response[1] && !window.opener){
+      var content = '<table><tr><td width="98%" align="center"><b>' + rcmail.gettext('calendar.reminders') + '</b></td>' + 
+                    '<td><a href="#"><span title="' + rcmail.gettext('calendar.minimize') + '" onclick="$(\'#reminderscount\').html($(\'#reminders li\').size());$(\'#remindersoverlay\').hide();$(\'#remindersoverlaysmall\').show()" class="ui-icon ui-icon-minus"></span></a></td>' +
+                    '</tr><tr><td align="center">(' + calendar_common.localeTimeString(new Date()) + ')</td></tr></table>' + 
+                    '<div><div style="position:absolute; right: 20px;"><small>[<a href="#" onclick="calendar_reminders.remove()">' + rcmail.gettext('calendar.removereminders') + '</a>]</small></div></div>' +
+                    '<div id="reminderlist"><ul id="reminders"><table>';
+      var i, title, liclass, id, event_id, startdate, enddate;
+      var divclass = 'remindersconfirmation';
+      for(i in response[1]){
+        id = response[1][i].reminder_id;
+        event_id = response[1][i].id;
+        title = '---';
+        liclass = '';
+        if(response[1][i]){
+          if(response[1][i].title != ''){
+            title = response[1][i].title;
+          }
+          if(!response[1][i].end_unix)
+            response[1][i].end_unix = response[1][i].start_unix;
+          if(response[1][i].start_unix < new Date().getTime()/1000 && response[1][i].end_unix >= new Date().getTime()/1000){
+            liclass = 'started';
+            title = title + ' (' + rcmail.gettext('calendar.started') + ')';
+            if(divclass == 'remindersconfirmation')
+              divclass = 'remindersnotice';
+          }
+          else if(response[1][i].start_unix < new Date().getTime()/1000 && response[1][i].end_unix < new Date().getTime()/1000){
+            liclass = 'terminated';
+            title = title + ' (' + rcmail.gettext('calendar.terminated') + ')';
+            if(divclass == 'remindersconfirmation' || divclass == 'remindersnotice')
+              divclass = 'reminderswarning';
+          }
+          startdate = new Date(response[1][i].start_unix * 1000);
+          startdate = calendar_common.localeTimeString(startdate);
+          enddate = new Date(response[1][i].end_unix * 1000); 
+          enddate = calendar_common.localeTimeString(enddate);
+          content = content + 
+                            '<tr id="rtr1' + id + '"><td colspan="4"><li id="rli' + i + '" class="' + liclass + '">' + 
+                            title + '</td></tr>' + 
+                            '<tr id="rtr2' + id + '">' +
+                            '<td rowspan="2"><span title="' + rcmail.gettext('calendar.noticed') + '" ' + 
+                            'onclick="setTimeout(function() {calendar_reminders.remove(\'' + id + '\', \'' + event_id + '\')},500)"><input type="checkbox" /></span></td>' + 
+                            '<td>' +  rcmail.gettext('calendar.starts') + '</td><td>' + rcmail.gettext('calendar.at') + '</td><td align="right">' +
+                            startdate + '</td>' + 
+                            '</tr>' +
+                            '<tr id="rtr3' + id + '"><td>' +  rcmail.gettext('calendar.ends') + '</td><td>' + rcmail.gettext('calendar.at') + '</td><td align="right">' +
+                            enddate + '</td></tr>' + 
+                            '<tr id="rtr4' + id + '"><td colspan="4"><hr align="left" width="100%" /></li></td></tr>';
+        }
+      }      
+      content = content + "</table></ul></div>";
+      $('#remindersoverlay').html('<div id="reminderscontent">' + content + '</div>');
+      content = '<table><tr><td class="smallreminders" width="98%" align="center">' + rcmail.gettext('calendar.reminders') + '&nbsp;(<span id="reminderscount">' + $("#reminders li").size() + '</span>)</td>' + 
+                '<td><a href="#"><span title="' + rcmail.gettext('calendar.maximize') + '" onclick="$(\'#remindersoverlay\').show();$(\'#remindersoverlaysmall\').hide()" class="ui-icon ui-icon-plus"></span></a></td>' +
+                '</tr></table>';
+      $('#remindersoverlaysmall').html(content);
+      $('#remindersoverlaysmall').attr('class', divclass);
+      for(i in response[1]){
+        calendar_common.qtip(response[1][i], $('#rli' + i),'reminders');
+      }
+      if(response[0]){
+        $('#remindersoverlay').show();
+        $('#remindersoverlaysmall').hide();
+        // HTML5
+        try {
+          var elem = $('<audio src="plugins/calendar/sound.wav" />');
+          elem.get(0).play();
+        }
+        // old method
+        catch (e) {
+          var elem = $('<embed id="sound" src="plugins/calendar/sound.wav" hidden=true autostart=true loop=false />');
+          elem.appendTo($('body'));
+          window.setTimeout("$('#sound').remove()", 5000);
+        }
+      }
+      if($("#reminders li").size() > 0){
+        if($('#remindersoverlay').css('display') == 'none'){
+          $("#reminderscount").html($("#reminders li").size());
+          $('#remindersoverlaysmall').show();
+        }
+      }
+      else{
+        $('#remindersoverlay').hide();
+        $('#remindersoverlaysmall').hide();
+      }
+    }
+    else{
+      $('#remindersoverlay').hide();
+      $('#remindersoverlaysmall').hide();
+    }
+  }
+}
+
+var calendar_reminders = new calendar_reminders();
+
+$(document).ready(function() {
+  rcmail.addEventListener('plugin.calendar_displayReminders', displayReminders);
+  function displayReminders(response){
+    if(response){
+      calendar_reminders.display(response);
+    }
+  }
+  rcmail.addEventListener('init', function(evt) {
+    if((rcmail.env.action == 'compose' && rcmail.env.compose_newwindow === true) || rcmail.env.template =='terms'){
+      //do not schedule reminders
+    }
+    else{
+      if(self.location == parent.location || parent.roundcube_wrapper){
+        window.setTimeout("calendar_reminders.schedule();", 1500);
+      }
+    }
+  });
+});

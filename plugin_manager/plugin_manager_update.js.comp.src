@@ -1,0 +1,330 @@
+function news(obj){
+  if($('#newsletter').prop('checked')){
+     if($('#firstname').val() == ''){
+       alert('Please enter your First Name');
+       return false;
+     }
+     if($('#lastname').val() == ''){
+       alert('Please enter your Last Name');
+       return false;
+     }
+     var nl = 0;
+     if($('#newsletter').prop('checked'))
+       nl = 1;
+     obj.href = obj.href + '&_newsletter=' + nl + '&_firstname=' + escape($('#firstname').val()) + '&_lastname=' + escape($('#lastname').val());
+  }
+  if($('#devbranch').prop('checked')){
+    obj.href = obj.href + '&_branch=dev';
+  }
+  else if($('#stablebranch').prop('checked')){
+    obj.href = obj.href + '&_branch=stable';
+  }
+  return true;
+}
+
+function pm_get_credits(){
+  rcmail.http_post(
+    'plugin.plugin_manager_getcredits', ''
+  );
+}
+
+function pm_discard(){
+  $('.costs').prop('checked', false);
+  $('#cdlprice').text(pm_price());
+  $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+}
+
+function pm_notinstalled(){
+  $('.notinstalled').prop('checked', false);
+  $('#cdlprice').text(pm_price());
+  $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+}
+
+function pm_update_credits(response){
+  if(response){
+    if($('#cdlcredits').text() != ''){
+      if(parseInt(response) != parseInt($('#cdlcredits').text())){
+        var newcredits = parseInt(response) - parseInt($('#cdlcredits').text());
+        $('#cdlcredits').text(response);
+        $('#cdlprice').text(pm_price());
+        $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+        rcmail.display_message('MyRC$ ' + newcredits + ' ' + rcmail.gettext('creditsupdated','plugin_manager'), 'confirmation');
+      }
+    }
+  }
+  window.setTimeout('pm_get_credits()', 1000 * 30);
+}
+
+function pm_hmail(hmail){
+  $('.chbox').each(function(){
+    if($(this).attr('id') && $(this).attr('id').indexOf('_hmail_') > -1){
+      if(!$(this).prop('disabled')){
+        $(this).prop('checked', hmail);
+        $(this).trigger('click');
+        $('#cdlprice').text(pm_price());
+        $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+      }
+    }
+  });
+  var prop = new Array();
+  prop['name'] = 'pmhmail';
+  prop['value'] = hmail ? 0 : 1;
+  rcmail.save_pref(prop);
+}
+
+function pm_price(){
+  var price = 0;
+  var id;
+  $('.chbox').each(function(){
+    if($(this).prop('checked')){
+      id = $(this).attr('id');
+      if(id){
+        id = id.replace('chbox_', 'pmdlp_');
+        if($('#' + id).text()){
+          price = price + parseInt($('#' + id).text());
+        }
+      }
+    }
+  });
+  return price;
+}
+
+function pm_uncheck(){
+  $('.chbox').each(function(){
+    $(this).prop('checked', false);
+  });
+}
+
+function pmf(){
+  var checked = false;
+  $('.chbox').each(function(){
+    if($(this).prop('checked')){
+      checked = true;
+    }
+  });
+  if(!checked){
+    rcmail.display_message(rcmail.gettext('noupdates', 'plugin_manager'), 'notice');
+    return false;
+  }
+  var hint = '';
+  $('input[type=hidden]').each(function(){
+    if($(this).prop('name') !='_token' && $(this).prop('name') !='hosted_button_id' && $(this).prop('name') !='cmd'){
+      hint = hint + $(this).prop('name') + ': ' + $(this).val() + "\n";
+    }
+  });  
+  if(hint != ''){
+    var price = pm_price();
+    if(price > parseInt($('#cdlcredits').text())){
+      if(confirm("The price for this download exeeds your MyRC$ credits!\n\nPlease buy credits or discard incurring costs downloads.\n\nYes, buy MyRC$ credits [ok].\nNo, discard downloads [cancel].")){
+        window.open('./?_task=settings&_action=plugin.plugin_manager_buycredits');
+        return false;
+      }
+      else{ 
+        pm_discard();
+        return false;
+      }
+    }
+    $('#pm_price').val(price);
+    hint = hint.replace('##placeholder##', price);
+    var conf = '';
+    if(price > 0){
+      conf = 'Balance' + "\n---------\n" + 'We will charge your account by MyRC$ ' + price + " for this download.\n---------\n";
+    }
+    else{
+      conf = 'This download is free.' + "\n---------\n\n";
+    }
+    conf = conf + 'The form you are about to submit to...' + "\n" + $('form').prop('action') + "\n" + '...contains hidden fields:' + "\n\n" + hint + "\n";
+    conf = conf + 'Fairness is our mission. Be sure we will treat your informations as confidential.' + "\n\n";
+    conf = conf + 'NOTE: To guarantee the origin of this message, the text is hard coded (no localization possible).' + "\n\n";
+    conf = conf + 'Do you agree?';
+    var ret = confirm(conf);
+    if(ret){
+      $('#toggle').prop('checked', false);
+      window.setTimeout('pm_uncheck();', 500);
+      $('#cdlcredits').text($('#cdlremaining').text());
+      $('#cdlprice').text(0);
+    }
+    return ret;
+  }
+  return true;
+}
+
+function pm_resize(fudge){
+  if($('#table-container').get(0)){
+    var top = $('#table-container').offset().top;
+    var footer = $('#update_footer').height();
+    var height = $(window).height() - top - footer - 70;
+    $('#table-container').height(height);
+  }
+}
+
+function pm_goToByScroll(id){
+  $('.qtip').hide();
+  $('#table-container').animate({scrollTop: $("#"+id).offset().top - $('#table').offset().top},'slow');
+}
+
+$(window).resize(function(){
+  pm_resize();
+});
+
+$(document).ready(function(){
+  //minimalmode
+  if(typeof rcmail.get_cookie != 'undefined' && rcmail.env.skin == 'larry'){
+    if(rcmail.get_cookie('minimalmode') == 1){
+      $('#mainscreen').css('top', '65px');
+      $('#paypal').css('top', '50px');
+    }
+    $(window).resize(function(){
+      if(rcmail.get_cookie('minimalmode') == 1){
+        $('#mainscreen').css('top', '65px');
+        $('#paypal').css('top', '50px');
+      }
+      else{
+        $('#mainscreen').css('top', '132px');
+        $('#paypal').css('top', '100px');
+      }
+    });
+  }
+  // hide qtips
+  $('.about-link').click(function(){
+    $('.ui-tooltip').hide();
+  });
+  rcmail.addEventListener('init', function(evt){
+    rcmail.addEventListener('plugin.plugin_manager_getcredits', pm_update_credits);
+  });
+  var donate = $('#paypalcontainer').html();
+  $('#paypalcontainer').remove();
+  $('body').append(donate);
+  $('#message').hide();
+  $('#newsletter').click(function(){
+    $('#newletterdetails').toggle();
+    $('#firstname').focus();
+  });
+  $('#updatetoggle').click(function(){
+    if($(this).prop('checked')){
+      $(this).attr('title', rcmail.gettext('showall', 'plugin_manager'));
+      $('td').each(function(){
+        if($(this).hasClass('ok') || $(this).hasClass('thirdparty')){
+          $(this).parent().hide();
+        }
+      });
+    }
+    else{
+      $(this).attr('title', rcmail.gettext('hideuptodate', 'plugin_manager'));
+      $('td').each(function(){
+        if($(this).hasClass('ok') || $(this).hasClass('thirdparty')){
+          $(this).parent().show();
+        }
+      });
+    }
+  });
+  pm_resize();
+  window.setTimeout('pm_get_credits()', 1000 * 30);
+  /*$('.chbox').each(function(){
+    $(this).prop('disabled', false);
+  });*/
+  $('.chbox').click(function(){
+    $('#cdlprice').text(pm_price());
+    $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+  });
+  if(rcmail.env.google_ads){
+    window.setTimeout("$('#table').width($('#prefs-box').width() - 290);", 100);
+  }
+  else{
+    window.setTimeout("$('#table').width($('#prefs-box').width() - 50)", 100);
+  }
+  $('.anchorLink').live('click', function(){
+    id = 'pmu_' + $(this).attr('href').substr(1);
+    pm_goToByScroll(id);
+  });
+  $('#toggle').click(function(){
+    var stat = $(this).prop('checked');
+    $('.chbox').each(function(){
+      if(!$(this).prop('disabled') && $(this).is(':visible')){
+        $(this).prop('checked', stat);
+      }
+    });
+    $('#cdlprice').text(pm_price());
+    $('#cdlremaining').text(parseInt($('#cdlcredits').text()) - parseInt($('#cdlprice').text()));
+  });
+  $('#table-container').scroll(function(){
+    $('.qtip').hide();
+  });
+  $('th').mouseover(function(){
+    $('.qtip').hide();
+  });
+  $('#update_footer').mouseover(function(){
+    $('.qtip').hide();
+  });
+  $('td').each(function(){
+    if($(this).attr('title')){
+      var ct = {};
+      var temp = $(this).attr('title').split(' :: ');
+      if(temp.length == 2){
+        ct = {
+          title: temp[0],
+          text: temp[1]
+        }
+      }
+      else{
+        ct = {
+          text: $(this).attr('title')
+        }
+      }
+      var at = 'left bottom';
+      if($(this).attr('id')){
+        if($(this).attr('id').indexOf('pmu_') > -1){
+          at = 'bottom center';
+        }
+      }
+      $(this).qtip({
+        content: ct,
+        position: {
+          my: "top left",
+          at: at,
+          target: $(this),
+          viewport: $(window)
+        },
+        show: {
+          solo: true
+        },
+        hide: 'click',
+        style: {
+          classes: "ui-tooltip-light"
+        }
+      });
+    }
+  });
+  $('.chbox').each(function(){
+    if($(this).attr('title')){
+      var ct = {};
+      var temp = $(this).attr('title').split(' :: ');
+      if(temp.length == 2){
+        ct = {
+          title: temp[0],
+          text: temp[1]
+        }
+      }
+      else{
+        ct = {
+          text: $(this).attr('title')
+        }
+      }
+      $(this).qtip({
+        content: ct,
+        position: {
+          my: "top left",
+          at: "left bottom",
+          target: $(this),
+          viewport: $(window)
+        },
+        show: {
+          solo: true
+        },
+        style: {
+          classes: "ui-tooltip-red"
+        }
+      });
+    }
+  });
+});

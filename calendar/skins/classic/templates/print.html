@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title><roundcube:object name="pagetitle" /></title>
+<link rel="stylesheet" type="text/css" href="skins/classic/common.css" />
+</head>
+<body>
+<div id='message'></div>
+<div id='toolbar'>
+<roundcube:container name="toolbar" id="toolbar" />
+</div>
+<div id='print'>
+<span><roundcube:var name='session:username'/></span>
+<span>[<roundcube:label name='calendar.generated' />: <roundcube:object name='datetime'/>]</span>
+<br />
+<span><small><i><label for="filter"><roundcube:label name="filter" />:&nbsp;</label><span id="calfiltercontent"><roundcube:var name='session:calfilter'/></i></small></span>
+<div id='calendar'></div>
+<div id='agendalist'></div>
+</div>
+<div id='user'>
+</div>
+</body>
+</html>

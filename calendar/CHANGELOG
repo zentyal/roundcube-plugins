@@ -1,0 +1,34 @@
+VERSION                COMMENT
+----------------------------------------------------------------------------------------
+10.0                   - Moved advanced features to calendar_plus plugin
+                       - Separated jQuery timepicker code
+10.0.1                 - Added timepicker plugin to required plugins
+10.0.2                 - Bug fix: Don't save empty categories
+10.0.3                 - CSS fix for #sectionslist
+                       - Moved some images to calendar_plus
+10.0.4                 - Escape '?' in events dialog inputs
+10.0.5                 - Fixed scrollbars on left div (Larry skin)
+10.0.6                 - Don't save ctags in case of loading a layer
+11.0                   - Shared calendars via CalDAV (requires calendar_plus + sabredav)
+11.0.1                 - Prevent overwriting user settings when switching to a
+                         shared (readonly) calendar
+11.0.2 - 11.0.4        - Code clean up
+11.0.5                 - Bug fix for owncloud (implemented SabreDAV 1.6.x backwards
+                         compatibilty)
+11.0.6 - 11.0.8        - Code clean up
+11.0.9                 - Fixed a bug if categories contained blanks or apostrophs
+11.0.10 - 11.0.13      - Code clean up
+11.0.14                - Fixed a bug when moving events from default category to a
+                         category linked with a CalDAV
+11.0.15 - 11.0.16      - Improved cron jobs (deny access if remote IP <> cron_ip)
+11.0.17                - Fixed buttons previous and next day
+11.0.18                - Fixed illegal string offset warning in utils.php
+11.0.19                - Fixed method detection in caldav.php
+11.0.20                - Added Happy Birthday email feature
+11.0.21                - Added 'scheduled_sending' support
+11.0.22                - Set referrer for remote requests
+11.0.23                - Fixed a bug if description contained \n
+11.0.24 - 11.0.26      - Shorten ICS vcard valarm properties
+11.0.27                - Use $rcmail->user->data instead of $_SESSION
+11.0.28                - Some more comments in config.inc.php.dist
+11.0.29 - 11.0.30      - Bug fix if savepassword plugin is not installed

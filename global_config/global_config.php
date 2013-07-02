@@ -1,0 +1,15 @@
+<?php
+# 
+# This file is part of Roundcube "global_config" plugin.
+# 
+# Your are not allowed to distribute this file or parts of it.
+# 
+# This file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# 
+# Copyright (c) 2012 - 2013 Roland 'Rosali' Liebl - all rights reserved.
+# dev-team [at] myroundcube [dot] com
+# http://myroundcube.com
+# 
+class global_config extends rcube_plugin{static private$plugin='global_config';static private$author='myroundcube@mail4us.net';static private$authors_comments='<a href="http://myroundcube.com/myroundcube-plugins/plugins-installation#registering_plugin_manager_and_global_config" target="_new">Installation Guide</a><br /><a href="http://myroundcube.com/myroundcube-plugins/global_config-plugin#global_config" target="_new">Documentation</a>';static private$download='http://myroundcube.googlecode.com';static private$version='2.2';static private$date='19-11-2012';static private$licence='All Rights reserved';static private$requirements=array('Roundcube'=>'0.8.1','PHP'=>'5.2.1','required_plugins'=>array('qtip'=>'require_plugin','jqueryui'=>'require_plugin','qtip'=>'require_plugin',),);static private$prefs=null;static private$config_dist='config.inc.php.dist';function init(){$A=rcmail::get_instance();$this->load_config();if($A->task=='settings'){$P=$A->config->get('skin','classic');$Q=$A->config->get('plugin_manager_excluded_skins',array());if(!in_array($P,$Q)){$this->require_plugin('settings');}else{$this->add_hook('preferences_save',array($this,'saveprefs'));}}}static function about($G=false){$C=self::$requirements;foreach(array('required_','recommended_')as$F){if(is_array($C[$F.'plugins'])){foreach($C[$F.'plugins']as$B=>$J){if(class_exists($B)&&method_exists($B,'about')){$O=new$B(false);$C[$F.'plugins'][$B]=array('method'=>$J,'plugin'=>$O->about($G),);}else{$C[$F.'plugins'][$B]=array('method'=>$J,'plugin'=>$B,);}}}}$L=array();if(is_string(self::$config_dist)){if(is_file($R=INSTALL_PATH.'plugins/'.self::$plugin.'/'.self::$config_dist))include$R;else write_log('errors',self::$plugin.': '.self::$config_dist.' is missing!');}$E=array('plugin'=>self::$plugin,'version'=>self::$version,'date'=>self::$date,'author'=>self::$author,'comments'=>self::$authors_comments,'licence'=>self::$licence,'download'=>self::$download,'requirements'=>$C,);if(is_array(self::$prefs))$E['config']=array_merge($L,array_flip(self::$prefs));else$E['config']=$L;if(is_array($G)){$I=array('plugin'=>self::$plugin);foreach($G as$D){$I[$D]=$E[$D];}return$I;}else{return$E;}}function saveprefs($K){global$M;$A=rcmail::get_instance();$K['prefs']['skin']=$A->config->get('default_skin','larry');$H=$A->config->get('dont_override',array());foreach($H as$D=>$N){if($N=='skin'){unset($H[$D]);break;}}$M['dont_override']=$H;return$K;}}

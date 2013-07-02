@@ -1,0 +1,92 @@
+input.protected_category {
+  background-color: #B9C4F2;
+}
+
+#taskbar a:hover span.button-inner{
+  color: #3cf;
+  background-color: #2c2c2c;
+}
+
+#sections-table #rcmrowcalendarlink td.section{
+  background: url(images/calendar-col.png) 8px 5px no-repeat;
+}
+
+#sections-table #rcmrowcalendarlink.selected td.section{
+  background: url(images/calendar-col.png) 8px -19px no-repeat;
+}
+
+#caltoday,
+#calback,
+#calforward {
+  cursor: auto;
+}
+
+#caltoday a:link {
+  text-decoration:none;
+}
+
+#caltoday a:visited {
+  text-decoration:none;
+}
+
+#calback a:link {
+  text-decoration:none;
+}
+
+#calback a:visited {
+  text-decoration:none;
+}
+
+#calforward a:link {
+  text-decoration:none;
+}
+
+#calforward a:visited {
+  text-decoration:none;
+}
+
+#upcoming-content {
+  position: absolute;
+  bottom: 64px;
+  left: 10px;
+  border: 1px solid #A3A3A3;
+  border-radius: 4px;
+  box-shadow: 0 0 2px #999;
+  background-color: #D9ECF4;
+  cursor: auto;
+  z-index: 5;
+}
+
+#upcoming-content .boxtitle {
+  height: 15px !important;
+}
+
+#upcoming-container {
+  position: absolute;
+  top: 19px;
+  bottom: 0px;
+  left: 0px;
+  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#upcoming {
+  margin: 0 auto;
+  /*border: solid 1px #AFCFEF;*/
+}
+
+#upcoming_1 {
+  margin: 0 auto;
+  /*border: solid 1px #AFCFEF;*/
+}
+
+#upcoming_2 {
+  margin: 0 auto;
+  /*border: solid 1px #AFCFEF;*/
+}
+
+#upcoming_preview pre {
+  font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}

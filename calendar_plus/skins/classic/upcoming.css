@@ -1,0 +1,15 @@
+/***************************************************************************
+ * This file is part of Roundcube "##PLUGIN##" plugin.              
+ *                                                                 
+ * Your are not allowed to distribute this file or parts of it.    
+ *                                                                 
+ * This file is distributed in the hope that it will be useful,    
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of  
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.          
+ *                                                                 
+ * Copyright (c) 2012 - ##YEAR## Roland 'Rosali' Liebl - all rights reserved
+ * dev-team [at] myroundcube [dot] com
+ * http://myroundcube.com
+ ***************************************************************************/
+
+#calendaroverlay{position:absolute; bottom:43px; left:21px; z-index:239; background:url(../../../../skins/classic/images/display/loading.gif) 10px 25px no-repeat; background-color:#F6F6F6; filter:alpha(opacity=90); -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";}.fc-event-skin{font-size:9px;}.fc-grid .fc-event-time{font-weight:normal;}

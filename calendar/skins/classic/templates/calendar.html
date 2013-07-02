@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title><roundcube:object name="pagetitle" /></title>
+<meta http-equiv="X-UA-Compatible" content="IE=7; IE=8" />
+<link rel="stylesheet" type="text/css" href="skins/classic/settings.css" />
+<link rel="stylesheet" type="text/css" href="skins/classic/mail.css" />
+<roundcube:include file="/includes/links.html" />
+<roundcube:object name="cal_category_css" />
+</head>
+<body>
+<roundcube:include file="/includes/taskbar.html" />
+<roundcube:include file="/includes/header.html" />
+<div id='messagetoolbar'>
+<roundcube:container name="toolbar" id="toolbar" />
+</div>
+<div id='calquicksearchbar'>
+<img id='calsearchmod' src='/images/icons/glass_roll.png' width='16' height='16' title="<roundcube:label name="searchmod" />" />
+<input id='calsearchfilter' type='text' name='_cal_searchfilter' autocomplete="off" />
+<a href='#' id='calsearchreset'><img src='/images/icons/reset.gif' width='13' height='13' /></a>
+</div>
+<div id='calsearchdialog' title='<roundcube:label name="calendar.calsearch" />'>
+<table id='calsearch_table' class='records-table' cols='1' cellspacing='0'></table>
+</div>
+<roundcube:object name="cal_searchset" />
+<div id='todaybutton'><center>
+  <button id="prevbut" type="button" title="<roundcube:label name="calendar.prevrange" />"><<</button>
+  <button id="todaybut" type="button" disabled="disabled"><roundcube:label name="today" /></button>
+  <button id="nextbut" type="button" title="<roundcube:label name="calendar.nextrange" />">>></button>
+</center></div>
+<div id="calendar-header">
+  <div class="boxtitle">
+    <center>
+      <span id="cal_boxtitle" ></span>
+    </center>
+  </div>
+</div>
+<div id="mainscreen">
+  <div id="sectionslist">
+    <div id="datepicker-title" class="boxtitle"></div>
+    <div id="weeknumber" style="padding: 5px 0px 0px 0px"></div><hr />
+    <div class="boxtitle">
+      <center>
+        <a href="#"><img src="plugins/calendar/skins/classic/images/dayview.png" id="daybut" title="<roundcube:label name="calendar.day" />" width="16" height="15" /></a>&nbsp;&nbsp;
+        <a href="#"><img src="plugins/calendar/skins/classic/images/weekview.png" id="weekbut" title="<roundcube:label name="calendar.week" />" width="16" height="15" /></a>&nbsp;&nbsp;
+        <a href="#"><img src="plugins/calendar/skins/classic/images/monthview.png" id="monthbut" title="<roundcube:label name="calendar.month" />" width="16" height="15" /></a>
+      </center>
+    </div>
+    <div type="text" id="jqdatepicker"></div>
+    <div id="upcoming-maincontainer">
+      <div id="upcoming"></div>
+    </div>
+  </div>  
+  <div id="prefs-box">
+    <div id='calendar-container'>
+      <div id='calendar'></div>
+    </div>
+  </div>
+</div>
+<roundcube:include skin_path="plugins/calendar/skins" file="/includes/event.html" />
+<div id="calswitch">
+  <form name="switch" id="switch" method="post" action="./?_task=dummy&_action=plugin.calendar">
+    <label for="cal_user"><roundcube:label name="calendar.cal_user" /></label>:&nbsp;
+    <span id="calusers"></span>
+  </form>
+</div>
+<div id="calfilter">
+  <form name="filter" id="filter" method="post" action="./?_task=dummy&_action=plugin.calendar_setfilters">
+    <br />
+    <div id="calfilterscontainer"></div>
+  </form>
+</div>
+<div id="calendaroverlay"></div>
+</body>
+</html>

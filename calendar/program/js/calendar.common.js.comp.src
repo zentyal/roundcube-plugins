@@ -1,0 +1,202 @@
+// unload handling
+$(window).bind('beforeunload', function() {
+  if(!parent.summaryisparent && $('#calendaroverlay').is(':visible')){
+    return rcmail.gettext('calendar.unloadwarning');
+  }
+});
+
+// remember browser timezone
+function cal_setCookie(c_name,value,exdays){
+  var exdate=new Date();
+  exdate.setDate(exdate.getDate() + exdays);
+  var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
+  document.cookie=c_name + "=" + c_value;
+}
+cal_setCookie('clienttimezone',new Date().getTimezoneOffset() / 60 * 3600 * -1, 1);
+
+function calendar_common(){
+  /* fetch calendar sources */
+  this.eSources = function (response, truncate){
+    var urls = new Array();
+    var gmtoffset = new Date().getTimezoneOffset() / 60;
+    var category;
+    if(response.settings['cal_previews'] > 7)
+      response.settings['cal_previews'] = 7;
+    if(response.settings.backend == 'caldav' && response.settings.caldavs && response.settings.caldavs.length){
+      for(var i=0; i<response.settings.caldavs.length; i++){
+        if(response.settings.caldavs[i])
+          category = response.settings.caldavs[i];
+        else
+          category = '';
+        urls[i] = $.fullCalendar.jsonFeed(rcmail.env.comm_path,
+          {
+            'gmtoffset': gmtoffset,
+            'additionaldays': response.settings['cal_previews'],
+            'cals': 'calendars',
+            'category': category
+          });
+      }
+      i = i -1;
+    }
+    else{
+      var i = -1;
+    }
+    urls[i+1] = $.fullCalendar.jsonFeed(rcmail.env.comm_path,
+      {
+        'gmtoffset': gmtoffset,
+        'additionaldays': response.settings['cal_previews'],
+        'cals': 'calendar'
+
+      });
+    urls[i+2] = $.fullCalendar.jsonFeed(rcmail.env.comm_path,
+      {
+        'gmtoffset': gmtoffset,
+        'additionaldays': response.settings['cal_previews'],
+        'cals': 'layers'
+      });
+    return urls;
+  }
+  
+  /* localized time string */
+  this.localeTimeString = function(t){
+    var date = new Date(t);
+    if(
+        typeof js_date_formats != 'undefined' &&
+        typeof js_time_formats != 'undefined' &&
+        rcmail.env.rc_date_format &&
+        rcmail.env.rc_time_format &&
+        js_date_formats[rcmail.env.rc_date_format] &&
+        js_time_formats[rcmail.env.rc_time_format] &&
+        date.getTime()
+      ){
+      var ret = date.format('dddd, ' + js_date_formats[rcmail.env.rc_date_format] + ' ' + js_time_formats[rcmail.env.rc_time_format]);
+      for(i in Date.dayNames){
+        ret = ret.replace(Date.dayNames[i], rcmail.gettext('calendar.' + Date.dayNames[i].toLowerCase()));
+      }
+    }
+    else{
+      var temp = t.toLocaleString();
+      temp = temp.split('(');
+      var ret = temp[0].substr(0, temp[0].length - 3);//replace(':00 ', ' ');
+    }
+    return ret;
+  }
+  
+  /* qtips */
+  this.qtip = function(event, element, mode){
+    if(!event)
+      return element;
+    var ext = '';
+    if(typeof event.location != 'undefined' && event.location != '')
+      ext = ext + "<div><hr /><small>@" + event.location + "</small></div>";
+    if(typeof event.classNameDisp != 'undefined' && event.classNameDisp != '')
+      ext = ext + "<div><hr /><small><i>[" + event.classNameDisp + "]</i></small></div>";
+    var start = "<div style='white-space:nowrap'><small><img width='15' height='15' align='absmiddle' src='./plugins/calendar/skins/" + rcmail.env.skin + "/images/start.png' />&nbsp;" + this.localeTimeString(new Date(event.start)) + "</small></div>";
+    var end = '';
+    if(event.end && new Date(event.end).getTime() > new Date(event.start).getTime()){
+      end = "<div style='white-space:nowrap'><small><img width='15' height='15' align='absmiddle' src='./plugins/calendar/skins/" + rcmail.env.skin + "/images/end.png' />&nbsp;" + this.localeTimeString(new Date(event.end)) + '</small></div>';
+    }
+    if(!event.title)
+      event.title = '---';
+    if(event.title || event.description){
+      if(typeof event.description != 'undefined' && event.description != ''){
+        qtipbody = event.description;
+        if(qtipbody){
+          while(qtipbody.indexOf("\n") > -1){
+            qtipbody = qtipbody.replace("\n","<br>");
+          }
+        }
+        ct = {
+          title: "<div><small>" + event.title + "</small></div><div><hr /></div>" +start + end,
+          text:  "<div><small>" + qtipbody + "</small></div>" + ext
+        }
+      }
+      else{
+        ct = {
+          title: start + end,
+          text: "<div><small>" + event.title + "</small></div>" + ext
+        }
+      }
+      element.qtip({
+        content: ct,
+        position: {
+          my: "top left",
+          at: "left bottom",
+          target: element,
+          viewport: $(window)
+        },
+        hide: {
+          effect: function () { $(this).slideUp(5, function(){ $(this).dequeue(); }); }
+        },
+        style: {
+          classes: "ui-tooltip-light"
+        }
+      });
+    }
+    return element;
+  }
+  
+  /* event display modifications */
+  this.modifyEvents = function (event, element, view, response){
+    var mytitle = '';
+    if(!event.end)
+      event.end = event.start;
+    if(!event.title)
+      event.title = mytitle;
+    var titledisp = event.title;
+    var factor = 1;
+    if(event.start && event.end && view.name != 'basicDay' && view.name != 'agendaDay'){
+      factor = event.end.getTime() - event.start.getTime();
+      factor = parseInt(factor / 86400000);
+      if(factor < 1)
+        factor = 1;
+    }
+    if(titledisp.length > 25 * factor)
+      titledisp = titledisp.substr(0, 25 * factor - 3) + '...';
+    if(event.start && event.end){
+      if(
+          parseInt(event.start.getHours()) + parseInt(event.start.getMinutes()) != 0 ||
+          parseInt(event.end.getHours()) + parseInt(event.end.getMinutes()) != 82
+        ){
+        if(event.start.getTime() < view.visStart.getTime()){
+          var ts = '';
+        }
+        else{
+          if(parseInt(event.start.getHours()) + parseInt(event.start.getMinutes()) !=0)
+            var ts = event.start.format(js_time_formats[rcmail.env.rc_time_format]);
+          else
+            var ts = '';
+        }
+        if(event.end.getTime() > view.visEnd.getTime() || event.end == event.start){
+          var te = '';
+        }
+        else{
+          var te = event.end.format(js_time_formats[rcmail.env.rc_time_format]);
+        }
+        if(ts != '' || te != ''){
+          if(ts != ''){
+            mytitle = ts + "&nbsp;<span class='fc' style='padding:2px;'>";
+          }
+          mytitle = mytitle + titledisp;
+          if(ts != ''){
+            mytitle = mytitle + "</span>";
+          }
+          if(te != ''){
+            mytitle = mytitle + "<span class='fc' style='float:right;'>&nbsp;" + te + "</span>";
+          }
+          element.find('.fc-event-title').html(mytitle);
+        }
+        else{
+          element.find('.fc-event-title').html(titledisp);
+        }
+      }
+      else{
+        element.find('.fc-event-title').html(titledisp);
+      }
+    }
+    else{
+      element.find('.fc-event-title').html(titledisp);
+    }
+  }
+}
+var calendar_common = new calendar_common();

@@ -1,0 +1,12 @@
+VERSION                COMMENT
+-----------------------------------------------------------------------------------
+1.0                    - Initial release
+1.0.1                  - Fixed image paths for Classic, Litecube(f) skins
+1.0.2                  - Shared calendars via CalDAV (requires calendar + sabredav)
+1.0.3                  - Changed token management
+1.0.4 - 1.0.9          - Code improvements
+1.0.10                 - Share hint for read/write access was misplaced
+1.0.11                 - Fixed paths for getimagesize
+1.0.12                 - Code cleanup
+1.0.13                 - Set referrer for remote requests
+1.0.14                 - identities_imap compatibility

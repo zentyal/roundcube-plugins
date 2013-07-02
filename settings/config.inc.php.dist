@@ -1,0 +1,25 @@
+<?php
+
+/* settings plugin */
+
+/* limit languages:
+$rcmail_config['limit_languages'] = array();
+shows all available languages!
+
+NOTICE: If you want to limit the choice of languages then
+        uncomment the following settings.
+        User's preferred language is always shown!        
+*/
+$rcmail_config['limit_languages'] = array("en_US", "de_DE", "fr_FR", "cs_CZ");
+
+/* limit skins:
+$rcmail_config['limit_skins'] = array();
+shows all available skins!
+
+NOTICE: If you want to limit the choice of skins then
+        uncomment the following setting.
+        User's preferred skin is always shown!
+*/
+$rcmail_config['limit_skins'] = array("classic","larry");
+
+?>

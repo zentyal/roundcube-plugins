@@ -1,0 +1,361 @@
+function pm_get_credits(){
+  rcmail.http_post(
+    'plugin.plugin_manager_getcredits', ''
+  );
+}
+
+function pm_update_credits(response){
+  if(response){
+    if($('#cdlcredits').get(0) && parseInt(response) && (parseInt(response) != parseInt($('#cdlcredits').text()))){
+      var newcredits = parseInt(response) - parseInt($('#cdlcredits').text());
+      var color = newcredits > 0 ? 'green' : 'red';
+      var html = $('#accountdetails').html();
+      $('#accountdetails > tbody:last').append('<tr><td colspan="4" style="border: 1px solid lightgrey;">MyRC$ ' + rcmail.gettext('creditsupdated','plugin_manager') + '</td><td align="right"  style="border: 1px solid lightgrey; color: ' + color + ';">' + (newcredits > 0 ? '+' : '') + newcredits + '</td><td style="border: 1px solid lightgrey;">&nbsp;</td></tr>');
+      $('#cdlcredits').text(response);
+      rcmail.display_message('MyRC$ ' + newcredits + ' ' + rcmail.gettext('creditsupdated','plugin_manager'), 'confirmation');
+    }
+  }
+  window.setTimeout('pm_get_credits()', 1000 * 30);
+}
+
+function plugin_manager_save_prefs(){
+  $('.mainaction').hide();
+  var prefs = $('input[name*="man"]').serialize();
+  rcmail.http_post('plugin.plugin_manager_save', prefs);
+}
+
+$(document).ready(function(){
+  // update credtis
+  if(rcmail.env.framed){
+    window.setTimeout('pm_get_credits()', 1 * 1000);
+  }
+  // hide qtips
+  $('.about-link').click(function(){
+    $('.ui-tooltip').hide();
+  });
+  // add event listeners
+  rcmail.addEventListener('init', function(evt){
+    rcmail.addEventListener('plugin.plugin_manager_getcredits', pm_update_credits);
+  });
+  rcmail.addEventListener('plugin.plugin_manager_success', function(response) {
+    rcmail.pm_stat = $('input[name*="man"]').serialize();
+    rcmail.display_message(rcmail.gettext('successfullydeleted', 'plugin_manager'), 'confirmation');
+    if(response){
+      eval(response);
+      plugin_manager_save_prefs();
+    }
+    else{
+      plugin_manager_save_prefs();
+    }
+  });
+  rcmail.addEventListener('plugin.plugin_manager_saved', function(response) {
+    rcmail.pm_stat = $('input[name*="man"]').serialize();
+    rcmail.display_message(rcmail.gettext('successfullysaved', 'plugin_manager'), 'confirmation');
+    if(response){
+      eval(response);
+    }
+  });
+  rcmail.addEventListener('plugin.plugin_manager_error', function(response) {
+    rcmail.display_message(rcmail.gettext('errorsaving', 'plugin_manager'), 'error');
+    $('.mainaction').hide();
+    $(':checkbox').each(function(){
+      $(this).prop('disabled', true);
+    });
+    window.setTimeout("parent.location.href='./?_task=settings&_action=plugin.plugin_manager'", 3000);
+  });
+  rcmail.addEventListener('init', function(){
+    function float_fieldsets(){
+      rcmail.pm_mh = 0;
+      rcmail.pm_mh2 = new Array();
+      rcmail.pm_mw = 0;
+      rcmail.pm_top = 0;
+      rcmail.pm_row = -1;
+      $('.pm_section').each(function(){
+        if($(this).width() > rcmail.pm_mw)
+          rcmail.pm_mw = $(this).width();
+        if($(this).height() > rcmail.pm_mh)
+          rcmail.pm_mh = $(this).height();
+      });
+      $('.pm_section').each(function(){
+        $(this).width(rcmail.pm_mw);
+        $(this).height(rcmail.pm_mh);
+      });
+      $('.pm_fieldset').each(function(){
+        if($(this).offset().top > rcmail.pm_top){
+          rcmail.pm_row ++;
+          rcmail.pm_top = $(this).offset().top;
+          if(!rcmail.pm_mh2[rcmail.pm_row])
+            rcmail.pm_mh2[rcmail.pm_row] = $(this).height();
+        }
+        if($(this).height() > rcmail.pm_mh2[rcmail.pm_row]){
+          rcmail.pm_mh2[rcmail.pm_row] = $(this).height();
+        }
+      });
+      rcmail.pm_top = 0;
+      rcmail.pm_row = -1;
+      rcmail.pm_heights = new Array();
+      rcmail.pm_sections = -1;
+      $('.pm_fieldset').each(function(){
+        $(this).width(rcmail.pm_mw - 20);
+        if($(this).offset().top > rcmail.pm_top){
+          rcmail.pm_row ++;
+          rcmail.pm_top = $(this).offset().top;
+        }
+        rcmail.pm_sections ++;
+        rcmail.pm_heights[rcmail.pm_sections] = rcmail.pm_mh2[rcmail.pm_row];
+        $(this).height(rcmail.pm_mh2[rcmail.pm_row] - 20);
+      });
+      rcmail.pm_sections = -1;
+      $('.pm_section').each(function(){
+        rcmail.pm_sections ++;
+        $(this).height(rcmail.pm_heights[rcmail.pm_sections]);
+      });
+    }
+    float_fieldsets();
+    $(window).resize(function(){
+      $('.pm_section').each(function(){
+        $(this).attr('style', '');
+      });
+      $('.pm_fieldset').each(function(){
+        $(this).attr('style', '');
+      });
+      float_fieldsets();
+    });
+    $('.plugin_manager_li').click(function(){
+      $('#pm_restore_defaults').prop('checked', false);
+      $('#pm_check_all').prop('checked', false);
+      $('#pm_uncheck_all').prop('checked', false);
+    });
+    $('#pm_restore_defaults').click(function(){
+      $('#pm_check_all').prop('checked', false);
+      $('#pm_uncheck_all').prop('checked', false);
+      for(var i in rcmail.env.pm_restore){
+        $('#pm_chbox_' + rcmail.env.pm_restore[i][0]).prop('checked',  rcmail.env.pm_restore[i][1]);
+      }
+    });
+    $('#pm_check_all').click(function(){
+      $('#pm_uncheck_all').prop('checked', false);
+      $('#pm_restore_defaults').prop('checked', false);
+      for(var i in rcmail.env.pm_restore){
+        $('#pm_chbox_' + rcmail.env.pm_restore[i][0]).prop('checked',  true);
+      }
+    });
+    $('#pm_uncheck_all').click(function(){
+      $('#pm_check_all').prop('checked', false);
+      $('#pm_restore_defaults').prop('checked', false);
+      for(var i in rcmail.env.pm_restore){
+        $('#pm_chbox_' + rcmail.env.pm_restore[i][0]).prop('checked',  false);
+      }
+    });
+    $('#pm_update_plugins').click(function(){
+      parent.document.location.href = './?_task=settings&_action=plugin.plugin_manager_update&_warning=1';
+    });
+    rcmail.pm_stat = $('input[name*="man"]').serialize();
+    $('.mainaction').hide();
+    $('.mainaction').prop('disabled', true);
+    $('input:checkbox').click(function(){
+      if(rcmail.pm_stat != $('input[name*="man"]').serialize()){
+        $('.mainaction').prop('disabled', false);
+        $('.mainaction').show();
+      }
+      else{
+        $('.mainaction').prop('disabled', true);
+        $('.mainaction').hide();
+      }
+    });
+    $('.fsavedialog').click(function(){
+      var plugin = $(this).attr('name').replace('_plugin_manager_','');
+      var label = rcmail.gettext(plugin + '.plugindescription');
+      if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+        if($('.mainaction').prop('disabled') == false){
+          if($(this).prop('checked') && !$(this).hasClass('fconfig')){
+            plugin_manager_save_prefs();
+          }
+          else{
+            if(!$(this).hasClass('funinstall') && !$(this).hasClass('frequest') && !$(this).hasClass('frequestforce')){
+              plugin_manager_save_prefs();
+            }
+          }
+        }
+      }
+    });
+    $('.fconfig').click(function(){
+      if($(this).prop('checked')){
+        var plugin = $(this).attr('name').replace('_plugin_manager_','');
+        var label = rcmail.gettext(plugin + '.plugindescription');
+        if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+          if($('.mainaction').prop('disabled') == false){
+            $('.mainaction').hide();
+            var buttons = {};
+            buttons[rcmail.gettext('plugin_manager.yes')] = function(){
+              $('#plugin_manager_config_plugin').val(plugin);
+              document.forms.form.submit();
+              $('#jqdialog').dialog("close");
+            };
+            buttons[rcmail.gettext('plugin_manager.no')] = function(){
+              plugin_manager_save_prefs();
+              $('#jqdialog').dialog("close");
+            };
+            $('#jqdialog').html(label + '<hr /><p>' + rcmail.gettext('plugin_manager.furtherconfig') + '</p>');
+            $('#jqdialog').dialog({
+              'title': rcmail.gettext(plugin + '.pluginname'),
+              'buttons': buttons,
+              'position': [$(this).offset().left + 20, $(this).offset().top + 20],
+              'zIndex': 99999,
+              'close': function(){
+                $('#plugin_manager_config_plugin').val('');
+              }
+            });
+          }
+        }
+      }
+      else{
+        if(!$(this).hasClass('funinstall') && !$(this).hasClass('frequest') && !$(this).hasClass('frequestforce')){
+          plugin_manager_save_prefs();
+        }
+      }
+    });
+    $('.funinstall').click(function(){
+      if(!$(this).prop('checked')){
+        var plugin = $(this).attr('name').replace('_plugin_manager_','');
+        var label = rcmail.gettext(plugin + '.plugindescription');
+        if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+          if($('.mainaction').prop('disabled') == false){
+            $('.mainaction').hide();
+            var buttons = {};
+            buttons[rcmail.gettext('plugin_manager.yes')] = function(){
+              $('.mainaction').prop('disabled', true);
+              rcmail.http_post('plugin.plugin_manager_uninstall', '_uninstall=' + plugin);
+              $('#jqdialog').dialog("close");
+            };
+            buttons[rcmail.gettext('plugin_manager.no')] = function(){
+              plugin_manager_save_prefs();
+              $('#jqdialog').dialog("close");
+            };
+            $('#jqdialog').html(label + '<hr /><p>' + rcmail.gettext('plugin_manager.uninstall') + '</p>');
+            $('#jqdialog').dialog({
+              'title': rcmail.gettext(plugin + '.pluginname'),
+              'buttons': buttons,
+              'position': [$(this).offset().left + 20, $(this).offset().top + 20],
+              'zIndex': 99999,
+              'close': function(){
+              }
+            });
+          }
+        }
+      }
+    });
+    $('.frequest').click(function(){
+      if(!$(this).prop('checked')){
+        $(this).prop('checked', true)
+        var plugin = $(this).attr('name').replace('_plugin_manager_','');
+        var label = rcmail.gettext(plugin + '.plugindescription');
+        if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+          if($('.mainaction').prop('disabled') == false){
+            $('.mainaction').hide();
+            var buttons = {};
+            buttons[rcmail.gettext('plugin_manager.disable')] = function(){
+              $('#pm_chbox_' + plugin).prop('checked', false);
+              plugin_manager_save_prefs();
+              $('#jqdialog').dialog("close");
+            };
+            buttons[rcmail.gettext('plugin_manager.remove')] = function(){
+              $('.mainaction').prop('disabled', true);
+              $('#pm_chbox_' + plugin).prop('checked', false);
+              if(confirm(rcmail.gettext('plugin_manager.areyousure')))
+                rcmail.http_post('plugin.plugin_manager_uninstall', '_uninstall=' + plugin);
+              else
+                plugin_manager_save_prefs();
+              $('#jqdialog').dialog("close");
+            };
+            $('#jqdialog').html(label + '<hr /><p>' + rcmail.gettext('plugin_manager.uninstallconfirm') + '</p>');
+            $('#jqdialog').dialog({
+              'title': rcmail.gettext(plugin + '.pluginname'),
+              'buttons': buttons,
+              'position': [$(this).offset().left + 20, $(this).offset().top + 20],
+              'zIndex': 99999,
+              'close': function(){
+              }
+            });
+          }
+        }
+      }
+    });
+    $('.frequestforce').click(function(){
+      if(!$(this).prop('checked')){
+        $(this).prop('checked', true)
+        var plugin = $(this).attr('name').replace('_plugin_manager_','');
+        var label = rcmail.gettext(plugin + '.plugindescription');
+        if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+          if($('.mainaction').prop('disabled') == false){
+            var buttons = {};
+            buttons[rcmail.gettext('plugin_manager.remove')] = function(){
+              $('.mainaction').prop('disabled', true);
+              $('#pm_chbox_' + plugin).prop('checked', false);
+              rcmail.http_post('plugin.plugin_manager_uninstall', '_uninstall=' + plugin);
+              $('#jqdialog').dialog("close");
+            };
+            $('#jqdialog').html(label + '<hr /><p>' + rcmail.gettext('plugin_manager.uninstall') + '</p>');
+            $('#jqdialog').dialog({
+              'title': rcmail.gettext(plugin + '.pluginname'),
+              'buttons': buttons,
+              'position': [$(this).offset().left + 20, $(this).offset().top + 20],
+              'zIndex': 99999,
+              'close': function(){
+              }
+            });
+          }
+        }
+      }
+    });
+    $('.plugin_manager_ul > li').each(function(){
+      var plugin = $(this).attr('id');
+      var temparr = plugin.split('pmid_');
+      plugin = temparr[1];
+      if(rcmail.env['pm_plugin_' + plugin] != 1){
+        if(rcmail.env['pm_buttons_' + plugin]){
+          for(var i in rcmail.env['pm_buttons_' + plugin]){
+            if(parent.$(rcmail.env['pm_buttons_' + plugin][i]).get(0)){
+              parent.$(rcmail.env['pm_buttons_' + plugin][i]).hide();
+            }
+            else{
+              if(parent.$(rcmail.env['pm_buttons_' + plugin][i]).get(0)){
+                parent.$(rcmail.env['pm_buttons_' + plugin][i]).show();
+              }
+            }
+          }
+        }
+      }
+      else{
+        if(rcmail.env['pm_buttons_' + plugin]){
+          if(!parent.$(rcmail.env['pm_buttons_' + plugin][0]).get(0)){
+            parent.location.href='./?_task=settings&_action=plugin.plugin_manager';
+          }
+        }
+      }
+      var label = rcmail.gettext(plugin + '.plugindescription');
+      if(label.indexOf('.plugindescription') == -1){
+        if(label.substr(0,1) != '[' && label.substr(label.length - 1, 1) != ']'){
+          $(this).qtip({
+            content: {
+              title: $(this).text().replace("\n",""),
+              text: label
+            },
+            position: {
+              my: "top left",
+              at: "left bottom",
+              target: $(this),
+              viewport: $(window)
+            },
+            hide: {
+              effect: function () { $(this).slideUp(5, function(){ $(this).dequeue(); }); }
+            },
+            style: {
+              classes: "ui-tooltip-light"
+            }
+          });
+        }
+      }
+    });
+  });
+});

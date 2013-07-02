@@ -1,0 +1,23 @@
+<div id="caldav_dialog" style="display:none">
+<form name="caldav_dialog" id="caldav_form">
+<table>
+<tr><td nowrap><roundcube:label name="calendar.caldavurl" />: </td><td><input autocomplete="off" type="text" size="40" name="_caldav_url" id="caldav_url" /></td></tr>
+<tr><td nowrap><roundcube:label name="username" />: </td><td><input autocomplete="off" type="text" size="40" name="_caldav_user" id="caldav_user" /></td></tr>
+<tr><td nowrap><roundcube:label name="password" />: </td><td><input autocomplete="off" title="<roundcube:label name="calendar.passwordisnotset" />" type="password" size="40" name="_caldav_password" id="caldav_password" /></td></tr>
+<tr><td nowrap><roundcube:label name="calendar.reminders" />: </td><td>
+  <select name="_caldav_extr" id="caldav_extr" />
+    <option value="internal"><roundcube:object name="productname" /></option>
+    <option value="external"><roundcube:label name="calendar.externalreminders" /></option>
+  </select>
+</td></tr>
+<tr><td nowrap><roundcube:label name="calendar.caldavauthentication" />: </td><td>
+  <select name="_caldav_auth" id="caldav_auth" />
+    <option value="basic"><roundcube:label name="calendar.basic" /></option>
+    <option value="detect"><roundcube:label name="calendar.detect" /></option>
+  </select>
+</td></tr>
+<tr id="googlecaptcha"><td><roundcube:label name="calendar.googlecaptcha" />:</td><td>&nbsp;<a href="https://accounts.google.com/DisplayUnlockCaptcha" target="_new"><roundcube:label name="calendar.clickhere" /></a></td></tr>
+</table>
+<input type="hidden" name="_category" id="caldav_category" />
+</form>
+</div>

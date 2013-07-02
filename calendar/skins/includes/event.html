@@ -1,0 +1,547 @@
+<div id="event">
+  <ul>
+    <li><a href="#event-1" id="tab1"><roundcube:label name="calendar.general" /></a></li>
+    <li><a href="#event-2" id="tab2"><roundcube:label name="calendar.schedule" /></a></li>
+    <li><a href="#event-3" id="tab3"><roundcube:label name="import" /></a></li>
+    <li><a href="#event-4" id="tab4"><roundcube:label name="export" /></a></li>
+    <li><a href="#event-5" id="tab5"><roundcube:label name="calendar.reminders" /></a><li>
+  </ul>
+  <form autocomplete="off" id="form" target="uploader" name="form" method="post" enctype="multipart/form-data" action="./?_task=dummy&_action=plugin.calendar_upload">
+    <div id="event-1">
+    <table>
+      <tr>
+        <td><roundcube:label name="calendar.summary" />:</td>
+        <td><input name="summary" id="summary" size="53" /></td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.start" />:</td>
+        <td>
+            <input type="text" name="starttime" size="5" id="starttime" readonly="readonly" />
+            <span>&nbsp;</span>
+            <input type="text" name="startdate" size="12" id="startdate" readonly="readonly" />
+        </td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.end" />:</td>
+        <td>
+            <input type="text" name="endtime" size="5"  id="endtime" readonly="readonly" />
+            <span>&nbsp;</span>
+            <input type="text" name="enddate" size="12" id="enddate" readonly="readonly" />
+        </td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.description" />:</td>
+        <td><div id="description-container"><textarea name="description" id="description" rows="15" cols="39"></textarea></div></td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.location" />:</td>
+        <td><input name="location" id="location" size="40" /></td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.category" />:</td>
+        <td><span id="categories_html"></span></td>
+      </tr>    
+      <tr>
+      </tr>
+    </table>
+    </div>
+    <div id="event-2">
+    <table>
+      <tr>
+    </table>
+    <table>
+      <tr>
+        <td nowrap><roundcube:label name="calendar.recur" />:</td>
+        <td nowrap>
+          <select disabled name="recur" id="recursel">
+            <option value="0"><roundcube:label name="calendar.never" /></option>
+            <option value="d86400"><roundcube:label name="calendar.day" /></option>
+            <option value="d86401"><roundcube:label name="calendar.workday" /></option>
+            <option value="w604800"><roundcube:label name="calendar.week" /></option>
+            <option value="m2592000"><roundcube:label name="calendar.month" /></option>
+            <option value="y31536000"><roundcube:label name="calendar.year" /></option>
+          </select>
+        </td>
+        <td>
+          <div id="reset" style="display:none"><small><a class="button" href="#" id="recurselnever"><roundcube:label name="calendar.reset" /></a></small></div>
+        <td>
+        </td>
+      </tr>
+      <tr height="0">
+        <td colspan="3">
+        <div id="rrules" class="rrules" style="display:none;">
+          <div id="accordion0">
+            <div id="daylink"><span><a href="#"><roundcube:label name="calendar.day" /></a></span></div>
+            <div id="everydaydiv">
+              <table>
+                <tr>
+                  <td>
+                    <roundcube:label name="calendar.every" />
+                  </td>
+                  <td>
+                    <input readonly type="text" id="dnums" value="1" size="2" />
+                  </td>
+                  <td id="c1"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+                  <td id="c2"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+                  <td><roundcube:label name="calendar.day" /></td>
+                </tr>
+                <tr>
+                  <td>
+                    <roundcube:label name="calendar.every" />
+                  </td>
+                  <td>
+                    <a href="#" id="workdaylink"><roundcube:label name="calendar.workday" /></a>
+                  </td>
+                </tr>
+              </table>    
+            </div>           
+            <div id="weeklink"><span><a href="#"><roundcube:label name="calendar.week" /></a></span></div>
+            <div id="everyweekdiv">
+              <table>
+                <tr>
+                  <td>
+                    <roundcube:label name="calendar.every" />
+                  </td>
+                  <td>
+                    <input readonly type="text" id="wnums" value="1" size="2" />
+                  </td>
+                  <td id="c3"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+                  <td id="c4"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+                  <td><roundcube:label name="calendar.week" /></td>
+                </tr>
+              </table>
+              <div id="accordion1">
+                <div><span><a href="#" id="byweekdayslink"><roundcube:label name="calendar.byweekdays" /></a></span></div>
+                <div id="byweekdays">
+                  <table>
+                    <tr>
+                      <td>
+                        <roundcube:label name="sun" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td>
+                        <roundcube:label name="mon" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td>
+                        <roundcube:label name="tue" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td>
+                        <roundcube:label name="wed" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td>
+                        <roundcube:label name="thu" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td>
+                        <roundcube:label name="fri" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                      <td> 
+                        <roundcube:label name="sat" /></td><td><input class="byweekdays" type="checkbox" />
+                      </td>
+                    </tr>
+                  </table>                  
+                </div>                
+              </div>
+            </div>
+            <div id="monthlink"><span><a href="#"><roundcube:label name="calendar.month" /></a></span></div>
+            <div id="everymonthdiv">
+              <table>
+                <tr>
+                  <td>
+                    <roundcube:label name="calendar.every" />
+                  </td>
+                  <td>
+                    <input readonly type="text" id="mnums" value="1" size="2" />
+                  </td>
+                  <td id="c5"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+                  <td id="c6"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+                  <td><roundcube:label name="calendar.month" /></td>
+                </tr>
+              </table>
+              <div id="accordion2">
+                <div><span><a href="#" id="bymonthdayslink"><roundcube:label name="calendar.bydays" /></a></span></div>
+                <div id="bymonthdays">
+                  <table>
+                    <tr>
+                      <td align="right">
+                        <span>1</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>2</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>3</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>4</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>5</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>6</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>7</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span>8</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>9</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>10</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>11</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>12</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>13</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                        <td align="right">
+                        <span>14</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span>15</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>16</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>17</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>18</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>19</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>20</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>21</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span>22</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>23</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>24</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>25</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>26</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>27</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>28</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <span>29</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>30</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>31</span></td><td><input class="bymonthdays" type="checkbox" />
+                      </td>
+                      <td align="right">
+                        <span>&nbsp;</span></td><td><span>&nbsp;</span>
+                      </td>
+                      <td align="right">
+                        <span>&nbsp;</span></td><td><span>&nbsp;</span>
+                      </td>
+                      <td align="right">
+                        <span>&nbsp;</span></td><td><span>&nbsp;</span>
+                      </td>
+                      <td align="right">
+                        <span>&nbsp;</span></td><td><span>&nbsp;</span>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                <div><span><a href="#" id="byweekdaylink"><roundcube:label name="calendar.advanced" /></a></span></div>
+                <div>
+                   <table>
+                     <tr>
+                       <td>
+                         <roundcube:label name="calendar.every" />
+                       </td>
+                       <td>
+                         <select id="mevery">
+                           <option value="0">--</option>
+                           <option value="1"><roundcube:label name="calendar.first" /></option>
+                           <option value="2"><roundcube:label name="calendar.second" /></option>
+                           <option value="3"><roundcube:label name="calendar.third" /></option>
+                           <option value="4"><roundcube:label name="calendar.fourth" /></option>
+                           <option value="5"><roundcube:label name="calendar.fifth" /></option>
+                           <option value="-1"><roundcube:label name="calendar.last" /></option>
+                         </select>
+                       </td>
+                       <td>
+                         <select id="mweekday">
+                           <option value="0">--</option>
+                           <option value="SU"><roundcube:label name="sunday" /></option>
+                           <option value="MO"><roundcube:label name="monday" /></option>
+                           <option value="TU"><roundcube:label name="tuesday" /></option>
+                           <option value="WE"><roundcube:label name="wednesday" /></option>
+                           <option value="TH"><roundcube:label name="thursday" /></option> 
+                           <option value="FR"><roundcube:label name="friday" /></option>
+                           <option value="SA"><roundcube:label name="saturday" /></option>
+                         </select>
+                       </td>
+                     </tr>
+                   </table>
+                </div>                                
+              </div>
+            </div>
+            <div id="yearlink"><span><a href="#"><roundcube:label name="calendar.year" /></a></span></div>
+            <div id="everyyeardiv">
+              <table>
+                <tr>
+                  <td>
+                    <roundcube:label name="calendar.every" />
+                  </td>
+                  <td>
+                    <input readonly type="text" id="ynums" value="1" size="2" />
+                  </td>
+                  <td id="c7"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+                  <td id="c8"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+                  <td><roundcube:label name="calendar.year" /></td>
+                </tr>
+              </table>
+              <div id="accordion3">
+                <div><span><a href="#" id="bymonthdaylink"><roundcube:label name="calendar.bymonthdays" /></a></span></div>
+                <div id="byyearmonthdays">
+                  <table>
+                    <tr>
+                      <td>
+                        <roundcube:label name="calendar.every" />
+                      </td>
+                      <td>
+                        <table>
+                          <tr>
+                            <td>
+                             <input readonly type="text" id="ydnums" value="1" size="2" />
+                            </td>
+                            <td id="c9"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+                            <td id="c10"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td>
+                        <select id="ymonthday">
+                          <option value="0">--</option>
+                          <option value="1"><roundcube:label name="calendar.january" /></option>
+                          <option value="2"><roundcube:label name="calendar.february" /></option>
+                          <option value="3"><roundcube:label name="calendar.march" /></option>
+                          <option value="4"><roundcube:label name="calendar.april" /></option>
+                          <option value="5"><roundcube:label name="calendar.may" /></option> 
+                          <option value="6"><roundcube:label name="calendar.june" /></option>
+                          <option value="7"><roundcube:label name="calendar.july" /></option>
+                          <option value="8"><roundcube:label name="calendar.august" /></option>
+                          <option value="9"><roundcube:label name="calendar.september" /></option>
+                          <option value="10"><roundcube:label name="calendar.october" /></option>
+                          <option value="11"><roundcube:label name="calendar.november" /></option>
+                          <option value="12"><roundcube:label name="calendar.december" /></option>
+                        </select>
+                      </td>
+                    </tr>
+                  </table>             
+                </div>              
+                <div><span><a href="#" id="byyeardaylink"><roundcube:label name="calendar.advanced" /></a></span></div>
+                <div id="yadvanceddiv">
+                   <table>
+                     <tr>
+                       <td>
+                         <roundcube:label name="calendar.every" />
+                       </td>
+                       <td>
+                         <select id="yevery">
+                           <option value="0">--</option>
+                           <option value="1"><roundcube:label name="calendar.first" /></option>
+                           <option value="2"><roundcube:label name="calendar.second" /></option>
+                           <option value="3"><roundcube:label name="calendar.third" /></option>
+                           <option value="4"><roundcube:label name="calendar.fourth" /></option>
+                           <option value="5"><roundcube:label name="calendar.fifth" /></option>
+                           <option value="-1"><roundcube:label name="calendar.last" /></option>                     
+                         </select>
+                       </td>
+                       <td>
+                         <select id="yweekday">
+                           <option value="0">--</option>
+                           <option value="SU"><roundcube:label name="sunday" /></option>
+                           <option value="MO"><roundcube:label name="monday" /></option>
+                           <option value="TU"><roundcube:label name="tuesday" /></option>
+                           <option value="WE"><roundcube:label name="wednesday" /></option>
+                           <option value="TH"><roundcube:label name="thursday" /></option> 
+                           <option value="FR"><roundcube:label name="friday" /></option>
+                           <option value="SA"><roundcube:label name="saturday" /></option>
+                         </select>
+                       </td>
+                     </tr>
+                     <tr>
+                       <td>&nbsp;</td>
+                       <td>
+                         <roundcube:label name="calendar.in" />
+                       </td>
+                       <td>
+                         <select id="ymonth">
+                           <option value="0">--</option>
+                           <option value="1"><roundcube:label name="calendar.january" /></option>
+                           <option value="2"><roundcube:label name="calendar.february" /></option>
+                           <option value="3"><roundcube:label name="calendar.march" /></option>
+                           <option value="4"><roundcube:label name="calendar.april" /></option>
+                           <option value="5"><roundcube:label name="calendar.may" /></option> 
+                           <option value="6"><roundcube:label name="calendar.june" /></option>
+                           <option value="7"><roundcube:label name="calendar.july" /></option>
+                           <option value="8"><roundcube:label name="calendar.august" /></option>
+                           <option value="9"><roundcube:label name="calendar.september" /></option>
+                           <option value="10"><roundcube:label name="calendar.october" /></option>
+                           <option value="11"><roundcube:label name="calendar.november" /></option>
+                           <option value="12"><roundcube:label name="calendar.december" /></option>
+                         </select>                       
+                       </td>
+                     </tr>
+                   </table>
+                </div>                                
+              </div>
+            </div>                       
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div id="schedule">
+    <table>
+      <tr>
+        <td><roundcube:label name="calendar.occurrences" />:</td>
+        <td>
+          <table>
+            <tr>
+              <td>
+                <input name="occurrences" id="occurrences" type="text" size="2" readonly="readonly" value="1" />
+              </td>
+              <td id="c11"><img width="13" height="11" src="skins/classic/images/icons/plus.gif" title="+" alt="+" /></td>
+              <td id="c12"><img width="13" height="11" src="skins/classic/images/icons/minus.gif" title="-" alt="-" /></td>
+            </tr>
+          </table>
+        </td>
+      </tr>        
+      <tr>
+        <td><roundcube:label name="calendar.expires" />:</td>
+        <td>
+          <input name="expires" size="12" id="expires" type="text" readonly="readonly" />
+          <small>&nbsp;<a class="button"  href="#" id="infinite"><roundcube:label name="calendar.infinite" /></a></small>
+        </td>
+      </tr>  
+    </table>
+    </div>
+    </div>
+    <div id="event-3">
+    <table>           
+      <tr>
+        <td><roundcube:label name="import" />:</td>
+      </tr>
+      <tr>
+        <td><roundcube:object name="ics_upload" /></td>
+      </tr>
+    </table>
+    </div>
+    <div id="event-4">
+    <table>
+      <tr>
+        <td><roundcube:label name="calendar.export_as_file" /></td>
+        <td><a id="export_as_file" href="./?_task=dummy&_action=plugin.calendar_single_export_as_file"><input type="checkbox" id="export_to_file" /></a></td>
+      </tr>
+      <tr>
+        <td><roundcube:label name="calendar.send_invitation" /></td>
+        <td><a id="send_invitation" onclick="calendar_commands.compose('./?_task=dummy&_action=plugin.calendar_send_invitation')" href="#"><input type="checkbox" id="send_invitation" /></a></td>
+      </tr>
+    </table>
+    </div>
+    <div id="event-5">
+    <table>
+      <tr>
+        <td colspan="2">
+          <input name="_reminderenable" id="reminderenable" type="radio" checked="checked" value="1" />
+          <span>&nbsp;</span><roundcube:label name="calendar.reminderenable" />
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <input name="_reminderenable" id="reminderdisable" type="radio" checked="checked" value="0" />
+          <span>&nbsp;</span><roundcube:label name="calendar.reminderdisable" />
+        </td>
+      </tr>
+      <tr><td colspan="2"><hr /></td></tr>
+      <tr>
+        <td><input name="_reminderselector" id="minsel" value="60" type="radio" /><roundcube:label name="calendar.minutesbefore" />:&nbsp;</td>
+        <td>
+          <select name="_duration[60]" id="reminderminutesbefore">
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><input name="_reminderselector" id="hoursel" value="3600" type="radio" /><roundcube:label name="calendar.hoursbefore" />:&nbsp;</td>
+        <td>
+          <select name="_duration[3600]" id="reminderhoursbefore">
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><input name="_reminderselector" id="daysel" value="86400" type="radio" /><roundcube:label name="calendar.daysbefore" />:&nbsp;</td>
+        <td>
+          <select name="_duration[86400]" id="reminderdaysbefore">
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><input name="_reminderselector" id="weeksel" value="604800" type="radio" /><roundcube:label name="calendar.weeksbefore" />:&nbsp;</td>
+        <td>
+          <select name="_duration[604800]" id="reminderweeksbefore">
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td><input name="_reminderselector" id="customreminder" value="1" type="radio" readonly="readonly" /><roundcube:label name="calendar.customreminder" />:&nbsp;</td>
+        <td>
+          <input type="text" id="remindercustom" name="_remindercustom" readonly="readonly" size="19" />
+          <input type="hidden" name="_duration[1]" id="durationcustom" value="0" />
+        </td>
+      </tr>
+      <tr><td colspan="2"><hr /></td></tr>
+      <tr>
+        <td colspan="2" nowrap><roundcube:label name="calendar.remindertype" />:&nbsp;
+          <select name="_remindertype" id="remindertype">
+            <option value="email"><roundcube:label name="calendar.email" /></option>
+            <option value="popup"><roundcube:label name="calendar.popup" /></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td nowrap colspan="2"><roundcube:label name="calendar.mailto" />:&nbsp;<roundcube:object name="reminders_mailto" /></td>
+      </tr>
+      <tr>
+        <td nowrap colspan="3" id="custommail" onclick="calendar_gui.custommail()" style="display: none;"><a href="#"><roundcube:label name="calendar.custommail" /></a></td>
+      </tr>
+    </table>
+    </div>
+  </form>
+</div>
