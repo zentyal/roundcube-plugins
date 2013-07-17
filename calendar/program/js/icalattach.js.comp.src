@@ -1,0 +1,95 @@
+//compile 0a1a5a5d8ee6affa8ab79b4be4d87ea8
+var imported = false;
+var previewed = new Array();
+
+function plugin_ical_save(mime_id){
+  if(!imported){
+    rcmail.http_post('plugin.saveical', '_uid='+rcmail.env.uid+'&_mbox='+urlencode(rcmail.env.mailbox)+'&_part='+urlencode(mime_id), true);
+    imported = true;
+    setTimeout("plugin_ical_save_after()",1000);
+    plugin_ical_confirmation();
+  }
+  return false;
+}
+
+function plugin_ical_save_after(){
+  try{
+    plugin_ical_remove();
+    parent.$('#upcoming').fullCalendar('refetchEvents');  
+  }
+  catch(e){
+    plugin_ical_remove();
+    $('#upcoming').fullCalendar('refetchEvents');
+  }   
+}
+
+function plugin_ical_preview(id,mydate){
+  if(!imported && !previewed[id]){
+    previewed[id] = true;
+    var date = new Date(mydate);
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getFullYear();
+    try{
+      var today = parent.$('#upcoming').fullCalendar('getDate');
+    }
+    catch(e){
+      var today = $('#upcoming').fullCalendar('getDate');
+    }
+    if(today.getDate() != date || today.getMonth() != month || today.getFullYear() != year){
+      try{
+        parent.$('#upcoming').fullCalendar('gotoDate',year,month,day);
+      }
+      catch(e){
+        $('#upcoming').fullCalendar('gotoDate',year,month,day);
+      }
+      var date = new Date(mydate + (86400 * 1000));
+      var day = date.getDate();
+      var month = date.getMonth();
+      var year = date.getFullYear();
+      try{
+        parent.$('#upcoming_1').fullCalendar('gotoDate',year,month,day);
+      }
+      catch(e){
+        $('#upcoming_1').fullCalendar('gotoDate',year,month,day);
+      }
+      var date = new Date(mydate + (86400 * 1000 * 2));
+      var day = date.getDate();
+      var month = date.getMonth();
+      var year = date.getFullYear();
+      try{
+        parent.$('#upcoming_2').fullCalendar('gotoDate',year,month,day);
+      }
+      catch(e){
+        $('#upcoming_2').fullCalendar('gotoDate',year,month,day);
+      }
+    }
+  }
+}
+
+function plugin_ical_source(id){
+  if(!imported && !previewed[id]){
+    try{
+      parent.$('#upcoming').fullCalendar('refetchEvents');
+    }
+    catch(e){
+      try{
+        $('#upcoming').fullCalendar('refetchEvents');
+      }
+      catch(e){}
+    }
+  }
+}
+
+function plugin_ical_remove(){
+  try{
+    parent.$('#upcoming').fullCalendar('removeEvents','preview');
+  }
+  catch(e){
+    $('#upcoming').fullCalendar('removeEvents','preview');
+  }
+}
+
+function plugin_ical_confirmation(){
+  //find me: todo
+}

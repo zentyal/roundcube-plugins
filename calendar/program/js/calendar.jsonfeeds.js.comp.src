@@ -1,0 +1,106 @@
+(function($) {
+	$.fullCalendar.jsonFeed = function(feedUrl, options) {
+		options = options || {};
+		return function(start, end, callback) {
+		  var arr = DstDetect(start);
+		  if(!arr[0])
+		    arr[0] = new Date(0);
+		  if(!arr[1])
+		    arr[1] = new Date(0);
+		  if(options.additionaldays){
+		    end = new Date(end.getTime() + (parseInt(options.additionaldays) * 86400 * 1000));
+		  }
+		  if(options.category){
+		    var category = options.category;
+		  }
+		  else{
+		    var category = '';
+		  }
+		  if(options.cals == 'layers'){
+		    var action = 'plugin.calendar_fetchalllayers';
+		  }
+		  else{
+		    var action = 'plugin.getEvents';
+		  }
+      var tz_info = jzTimezoneDetector.determine_timezone();
+      response_text = tz_info.key;
+      if(typeof(tz_info.timezone) == 'undefined'){
+        response_text = 'undefined'
+      }
+      else{
+        response_text = tz_info.timezone['olson_tz']; 
+      }
+			var params = {
+			  '_action': action,
+				//'_gmtoffset': options.gmtoffset,
+				//'_realgmtoffset': (- TimezoneDetect(new Date()) / 60),
+				//'_dststart': Math.round(arr[0].getTime() / 1000),
+				//'_dstend': Math.round(arr[1].getTime() / 1000),
+				'_start': Math.round(start.getTime() / 1000),
+				'_end': Math.round(end .getTime() / 1000) + 86400,
+				'_category': category,
+				'_tzname': response_text,
+				'_echo': 1
+			};
+      $.ajax({ 
+        url: feedUrl, 
+        data: params, 
+        dataType: 'json',
+        error: function (obj,status,err){
+          console.log('calendar.jsonfeeds.js Ajax Error: ' + err);
+          callback({});
+        },
+        success: function(data) {
+          var events = [];
+          if (data){
+            events = data;
+          }
+          if(typeof events == "object"){
+            for(var i in events){
+              if(!events[i].end){
+                events[i].allDay = true;
+              }
+              else{
+                if(events[i].end - events[i].start >= 86340){
+                  events[i].allDay = true;
+                }
+                var dst = 0;
+                if(new Date(events[i].start * 1000).getTimezoneOffset() > new Date(events[i].end * 1000).getTimezoneOffset()){
+                  //DST begins
+                  dst = -3600;
+                  if(events[i].end - events[i].start == (86400 + dst)){
+                    events[i].allDay = true;
+                  }
+                  else if(events[i].end - events[i].start >= (86340 + dst)){
+                    events[i].allDay = true;
+                  }
+                }
+                if(new Date(events[i].start * 1000).getTimezoneOffset() < new Date(events[i].end * 1000).getTimezoneOffset()){
+                  //DST ends
+                  dst = 3600;
+                  if(events[i].end - events[i].start == (86400 + dst)){
+                    events[i].allDay = true;
+                  }
+                  else if(events[i].end - events[i].start >= (86340 + dst)){
+                    events[i].allDay = true;
+                  }
+                }
+              }
+              // do not span to next day
+              if((events[i].end - events[i].start - dst) / 86400 == Math.floor((events[i].end - events[i].start - dst) / 86400)){
+                events[i].end = events[i].end - 60;
+              }
+            }
+            callback(events);
+          }
+        }, 
+        complete: function(obj,status) {
+          // error|success
+          if(typeof status != 'undefined' && status == 'error'){
+            console.log(rcmail.gettext('calendar.invalidresponse') + ": " + feedUrl);
+          }        
+        } 
+      }); 
+		}		
+	}
+})(jQuery);

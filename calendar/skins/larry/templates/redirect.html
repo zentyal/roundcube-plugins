@@ -1,0 +1,19 @@
+<roundcube:object name="doctype" value="html5" />
+<html>
+<head>
+<title><roundcube:object name="pagetitle" /></title>
+<roundcube:include file="/includes/links.html" />
+<meta 
+http-equiv="refresh" 
+content="5;URL=./?_task=dummy&_action=plugin.calendar">
+<script type="text/javascript">
+  setTimeout('document.location.href="./?_task=dummy&_action=plugin.calendar"',5000);
+</script>
+</head>
+<body>
+<roundcube:object name="message" id="message" />
+<roundcube:include file="/includes/taskbar.html" />
+<roundcube:include file="/includes/header.html" />
+<roundcube:include file="/includes/footer.html" />
+</body>
+</html>

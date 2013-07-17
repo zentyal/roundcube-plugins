@@ -1,0 +1,119 @@
+//compile 0a1a5a5d8ee6affa8ab79b4be4d87ea8
+/* CalDAV replication */
+function calendar_replicate(){
+  var replication_runtime;
+  var replication_setTimeout;
+  var replication_timeout_counter = 0;
+  var replication_step = 1;
+  
+  this.init = function(response, env){
+    rcmail.env.cal_template = env;
+    rcmail.addEventListener('plugin.calendar_replicate', calendar_replicate.replicate);
+    rcmail.addEventListener('plugin.calendar_replicate_done', calendar_replicate.done);
+    rcmail.env.replication_complete = false;
+    this.replicate(new Date(rcmail.env.caleot_unix * 1000).getFullYear(), env);
+  }
+  
+  this.replicate = function(year, env){
+    if(env)
+      rcmail.env.cal_env = env
+    rcmail.env.replication_year = year;
+    if(replication_runtime){
+      if(new Date().getTime() - replication_runtime < 2000){
+        replication_step ++;
+      }
+      else{
+        replication_step = 1;
+      }
+      replication_step = Math.max(1, replication_step);
+    }
+    if(replication_setTimeout)
+      window.clearTimeout(replication_setTimeout);
+    if(rcmail.env.cal_env == 'calendar'){
+      if(rcmail.env.skin == 'larry'){
+        $('#calreloadbut').removeClass('calloadingbut');
+        $('#calreloadbut').addClass('calreloadbut');
+      }
+      else{
+        $('#calreloadbut').attr('src', 'plugins/calendar/skins/' + rcmail.env.skin + '/images/loading.gif');
+      }
+      $('#calreloadbut').attr('title', rcmail.gettext('calendar.backgroundreplication') + " [" + year + "]");
+    }
+    else{
+      // find me: show something in upcoming cal
+    }
+    replication_setTimeout = window.setTimeout('calendar_replicate.timeout()', 1000 * 20);
+    if(rcmail.env.noreplication){
+      calendar_replicate.done('_' + Math.round(new Date().getTime() / 1000, 0), false)
+    }
+    else{
+      if(rcmail.env.skin == 'larry'){
+        $('#calreloadbut').addClass('calloadingbut');
+        $('#calreloadbut').removeClass('calreloadbut');
+      }
+      else{
+        $('#calreloadbut').attr('src', 'plugins/calendar/skins/' + rcmail.env.skin + '/images/loading.gif');
+      }
+      rcmail.http_post('plugin.calendar_replicate', '_year=' + year + '&_step=' + replication_step);
+    }
+    replication_runtime = new Date().getTime();
+  }
+  
+  this.timeout = function(){
+    rcmail.display_message(rcmail.gettext('calendar.replicationtimeout') + ' [' + rcmail.env.replication_year + ']', 'error');
+    rcmail.env.calreplicate_step = 1;
+    if(replication_timeout_counter < 3){
+      rcmail.display_message(rcmail.gettext('calendar.resumereplication') + ' [' + rcmail.env.replication_year + ']', 'notice');
+      this.replicate(rcmail.env.replication_year);
+    }
+    else{
+      rcmail.display_message(rcmail.gettext('calendar.replicationfailed') + ' [' + rcmail.env.replication_year + ']', 'error');
+      this.done(new Date().getTime() / 1000, true);
+    }
+    replication_timeout_counter ++;
+  }
+  
+  this.done = function(response, failure){
+    if(rcmail.env.cal_env == 'calendar'){
+      if(rcmail.env.skin == 'larry'){
+        $('#calreloadbut').removeClass('calloadingbut');
+        $('#calreloadbut').addClass('calreloadbut');
+      }
+      else{
+        $('#calreloadbut').attr('src', 'plugins/calendar/skins/' + rcmail.env.skin + '/images/reload.png');
+      }
+    }
+    if(response == '')
+      return;
+    response = response + '';
+    window.clearTimeout(replication_setTimeout);
+    if(rcmail.env.cal_env == 'calendar'){
+      if(failure){
+        $('#calreloadbut').attr('title', rcmail.gettext('calendar.replicationfailed') + " " + calendar_common.localeTimeString(new Date(response * 1000)));
+        rcmail.env.replication_complete = false;
+      }
+      else{
+        var lr = response;
+        if(lr.substr(0,1) == '_')
+          lr = lr.substr(1);
+        $('#calreloadbut').attr('title', rcmail.gettext('calendar.lastreplication') + " " + calendar_common.localeTimeString(new Date(lr * 1000)));
+        rcmail.env.replication_complete = new Date(response * 1000);
+      }
+    }
+    if(response.substr(0,1) != '_'){
+      calendar_replicate.refetch();
+    }
+  }
+  
+  this.refetch = function(){
+    if($('#calendaroverlay').is(':visible')){
+      window.setTimeout('calendar_replicate.refetch()', 1000);
+    }
+    else{
+      window.setTimeout("$('#calendaroverlay').hide()", 10);
+      $('#' + rcmail.env.cal_template).fullCalendar('refetchEvents');
+    }
+  }
+}
+
+var calendar_replicate = new calendar_replicate();
