@@ -154,9 +154,9 @@ ul.caltoolbarmenu li input {
   margin: 0 auto;
   position: absolute;
   top: 20px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  height: 100%;
+  left: 0;
+  right: 0;
   overflow: auto;   
 }
 
@@ -180,8 +180,80 @@ ul.caltoolbarmenu li input {
   font-size: 11px;
 }
 
-#upcoming {
-  margin: 0 auto;
+#subscriptiontoggle-content {
+  float: left;
+}
+
+a.subscriptionlink {
+  font-weight: normal;
+  padding: 0 4px 7px 4px;
+  border-top: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+  border-left: 2px solid #ccc;
+  border-top-left-radius: 3px;
+  -moz-border-top-left-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -moz-border-top-right-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  text-decoration: none;
+}
+
+a.subscriptionlink-selected {
+  color: #666666;
+  border-top: 2px solid #c0c0c0;
+  border-right: 2px solid #c0c0c0;
+  border-left: 2px solid #c0c0c0;
+  background-color: #d0d0d0;
+}
+
+a.subscriptionlink:hover {
+  color: #666666;
+  border-top: 2px solid #c0c0c0;
+  border-right: 2px solid #c0c0c0;
+  border-left: 2px solid #c0c0c0;
+  background-color: #c0c0c0;
+}
+
+#subscriptions-table .boxtitle {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+#subscriptions-table {
+  width: 100%;
+  max-height: 220px;
+  overflow: hidden;
+  background: #F9F9F9;
+}
+
+#subscription-table-content, #filters-table-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 200px;
+}
+
+#subscription-table-content div {
+  width: 22px;
+  height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 1px 1px 12px #999;
+  -webkit-box-shadow: #999 1px 1px 12px;
+}
+
+#filters-table-content div {
+  width: 22px;
+  height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 1px 1px 12px #999;
+  -webkit-box-shadow: #999 1px 1px 12px;
 }
 
 #upcoming-maincontainer {
@@ -258,8 +330,7 @@ pre {
 }
 
 #event,
-#calswitch,
-#calfilter {
+#calswitch {
   display: none;
 }
 
@@ -272,6 +343,10 @@ pre {
   border-color: #ffc;
   color: #000;
   border: 1px solid #ccc;
+}
+
+.ui-accordion .ui-accordion-header .ui-icon {
+  left: -.4em;
 }
 
 .ui-widget-header,

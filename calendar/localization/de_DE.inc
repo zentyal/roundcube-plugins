@@ -7,7 +7,7 @@
  | Copyright (C) 2010-2013, Roland 'rosali' Liebl
  |
  +-----------------------------------------------------------------------+
- | Author: myroundcube@mail4us.net - 01/02/2013 07:42:28
+ | Author: myroundcube@mail4us.net - 04/13/2013 06:18:17
  +-----------------------------------------------------------------------+
 */
 
@@ -17,7 +17,10 @@ $labels['plugindescription'] = 'Verwalten Sie Ihre Termine mit einen Kalendar. S
 $labels['calendarprovider'] = 'Dienst';
 $labels['forinstance'] = 'z.B.';
 $labels['caldavserver'] = 'CalDAV-Server';
+$labels['caldavsettings'] = 'CalDAV Einstellungen';
 $labels['unlink_caldav'] = 'Um diese Kategorie zu löschen müssen Sie zuerst den CalDAV-Server entfernen';
+$labels['unlink_caldav_warning'] = 'Sind Sie sicher?';
+$labels['unlink_events_warning'] = 'Wollen Sie alle Ereignisse in diesem Kalender endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden! Wählen Sie ABBRECHEN, um nur den Kalender, nicht aber die Ereignisse zu löschen.';
 $labels['caldavurl'] = 'CalDAV-Url';
 $labels['passwordisset'] = 'Passwort ist gesetzt';
 $labels['passwordisnotset'] = 'Password ist nicht gesetzt';
@@ -28,6 +31,7 @@ $labels['workdays'] = 'Arbeitstage';
 $labels['first_day'] = 'Erster Wochentag';
 $labels['categories'] = 'Kategorien';
 $labels['add_category'] = 'Kategorie hinzufügen';
+$labels['add_caldav'] = 'Eine CalDAV-Url hinzufügen';
 $labels['remove_category'] = 'Kategorie entfernen';
 $labels['calendar_feeds'] = 'Kalender Feeds';
 $labels['feeds'] = 'Feeds';
@@ -66,6 +70,10 @@ $labels['cal_notify'] = 'Email bei Änderung von Einträgen durch den Kalenderbe
 $labels['caldav_notify'] = 'Email bei Änderung von Einträgen durch andere Nutzer versenden';
 $labels['cal_notify_to'] = 'Empfänger';
 $labels['showbirthdays'] = 'Geburtstage anzeigen';
+$labels['googleuser'] = 'Google Konto';
+$labels['googlepass'] = 'Google Passwort';
+$labels['googlepassisset'] = 'Google Passwort ist gesetzt';
+$labels['googlepassisnotset'] = 'Google Passwort ist nicht gesetzt';
 $labels['googlecaptcha'] = 'Zugriff auf Ihr Google-Konto gewähren';
 $labels['clickhere'] = 'Hier klicken';
 $labels['titleFormatMonth'] = 'MMMM yyyy';
@@ -106,7 +114,7 @@ $labels['import_short'] = 'Importieren';
 $labels['category'] = 'Kategorie';
 $labels['preview'] = 'Vorschau';
 $labels['location'] = 'Ort';
-$labels['default'] = 'Keine';
+$labels['default'] = 'Standard';
 $labels['date'] = 'Datum';
 $labels['start'] = 'Beginn';
 $labels['end'] = 'Ende';
@@ -128,18 +136,22 @@ $labels['choose_date'] = 'Datum auswählen';
 $labels['click_here'] = 'Hier klicken';
 $labels['removed'] = 'Das folgende Ereignis wurde entfernt!';
 $labels['edited_by'] = 'Kalender geändert durch';
-$labels['addicalmsg'] = 'In den Kalender importieren';
+$labels['addicalmsg'] = 'Alle Ereignisse in den Kalender importieren';
 $labels['icalsavefailed'] = 'Import ist gescheitert';
 $labels['importedsuccessfully'] = 'Erfolgreich importiert';
 $labels['switch_calendar'] = 'Kalender wechseln';
 $labels['user'] = 'Benutzer';
 $labels['cal_user'] = 'Kalenderbenutzer';
 $labels['submit'] = 'Abschicken';
-$labels['filter_events'] = 'Einträge filtern';
+$labels['filter_events'] = 'Ereignisse filtern';
 $labels['filter'] = 'Filter';
-$labels['allevents'] = 'alle Einträge';
+$labels['checkall'] = 'check all';
+$labels['uncheckall'] = 'uncheck all';
+$labels['allevents'] = 'alle Ereignisse';
 $labels['removefilters'] = 'Filter entfernen';
-$labels['defaultcategory'] = 'Standardkategorie';
+$labels['defaultcategorylabel'] = 'Bezeichnung des Standardkalenders';
+$labels['defaultcategory'] = 'Standard';
+$labels['backgroundcolor'] = 'Hintergrundfarbe';
 $labels['general'] = 'Ereignis';
 $labels['schedule'] = 'Wiederholung';
 $labels['every'] = 'Jede(n/s)';
@@ -194,8 +206,11 @@ $labels['importconfirmation'] = 'Möchten Sie diese(n) Termin(e) in Ihren Kalend
 $labels['item'] = 'Ereignis';
 $labels['errorsaving'] = 'Beim Speichern ist ein Fehler aufgetreten';
 $labels['calreadonly'] = 'Sie haben nur Lesezugriff';
-$labels['mycalendar'] = 'mein Kalender';
+$labels['mycalendar'] = 'meine Kalender';
 $labels['allcalendars'] = 'alle Kalender';
+$labels['subscriptions'] = 'Abonnements';
+$labels['feed'] = 'Feed';
+$labels['caldav'] = 'CalDAV';
 $labels['protected'] = 'geschützt';
 $labels['calsearch'] = 'Suchergebnisse';
 $labels['calsearchnomatches'] = 'Keine Übereinstimmung';
@@ -240,6 +255,7 @@ $labels['editfuture'] = 'diesen und die folgenden Einträge';
 $labels['applyrecurring'] = 'Änderungen anwenden auf ...';
 $labels['birthday'] = 'Geburtstag';
 $labels['happybirthday'] = 'Herzliche Glückwünsche zum Geburtstag!';
+$labels['submenuprefix'] = '» ';
 $labels['undefined'] = '---';
 
 ?>

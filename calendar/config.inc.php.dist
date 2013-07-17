@@ -2,9 +2,8 @@
 // caldav debug
 $rcmail_config['caldav_debug'] = false;
 
-// backend type (dummy, caldav, database)
-// Note: "dummy" is only for demonstrating basic functionality.
-$rcmail_config['backend'] = "dummy";
+// backend type (caldav, database)
+$rcmail_config['backend'] = 'database';
 
 /* If you don't want that users are able to overwrite defaults, then add
    'backend' in main configuration file (./config/main.inc.php) to
@@ -62,14 +61,67 @@ $rcmail_config['default_caldav_backend'] = array(
   'extr' => true, // external reminder service (Google calendar reminders)
 );
 */
-/* SabreDAV example
+/* SabreDAV example */
 $rcmail_config['default_caldav_backend'] = array(
   'user' => '%u',
   'pass' => '%p',
-  'url' => 'http://dav.domain.ltd/calendars/%u/events',
-  'cat' => 'http://dav.domain.ltd/calendars/%u/%c',
+  'principals' => '',
+  'home' => 'http://dav.domain.tld',
+  'url' => 'http://dav.domain.tld/calendars/%u/events',
+  'cat' => 'http://dav.domain.tld/calendars/%u/%c',
   'auth' => 'detect', //basic or detect
   'extr' => false,
+);
+
+/* Associate default CaldDAV calendars */
+/*
+$rcmail_config['caldavs'] = array(
+  'Work' => array(
+                   'user' => '%u',
+                   'pass' => '%p',
+                   'url' => 'http://dav.mydomain.tld/calendars/%u/work',
+                   'auth' => 'detect',
+                   'readonly' => false,
+                   'extr' => false, // external reminder service (f.e. google calendar reminders)
+                 ),
+  'Holidays' => array(
+                   'user' => '%u',
+                   'pass' => '%p',
+                   'url' => 'http://dav.mydomain.tld/calendars/%u/holidays',
+                   'auth' => 'detect',
+                   'readonly' => false,
+                   'extr' => false, // external reminder service (f.e. google calendar reminders)
+                 ),
+  'Personal' => array(
+                   'user' => '%u',
+                   'pass' => '%p',
+                   'url' => 'http://dav.mydomain.tld/calendars/%u/personal',
+                   'auth' => 'detect',
+                   'readonly' => false,
+                   'extr' => false, // external reminder service (f.e. google calendar reminders)
+                 ),
+  'Family' => array(
+                   'user' => '%u',
+                   'pass' => '%p',
+                   'url' => 'http://dav.mydomain.tld/calendars/%u/family',
+                   'auth' => 'detect',
+                   'readonly' => false,
+                   'extr' => false, // external reminder service (f.e. google calendar reminders)
+                 ),
+);
+*/
+
+/* Caldav calendar auto-detection is executed on login.
+   Do not run auto-detection if last login is younger than ... (seconds)
+*/
+$rcmail_config['sync_collections'] = 3600; // 0 = always on login
+
+/* Do not autodetect the following collections.
+   If your collection resides on https://dav.mydomain.tld/calendars/users/roundcube/tasks/
+   then add to the array '/calendars/tasks'.
+*/
+$rcmail_config['caldav_hidden_collections'] = array(
+  '/calendars/tasks',
 );
 
 /* CalDAV Replication
@@ -92,7 +144,6 @@ $rcmail_config['cal_dont_save_passwords'] = false;
 /* Database table mapping */
 // notice: leading underscore
 $rcmail_config['backend_db_table_map'] = array(
-  'dummy' => '', // no db table
   'database' => '', // default db table
   'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
 );
@@ -116,6 +167,9 @@ $rcmail_config['cal_searchset'] = array(
   'categories'
 );
 
+/* display small basic agenda day in calendar view */
+$rcmail_config['hide_agenda_day_basic'] = true;
+
 /* display upcoming calendar in mailbox view
    If enabled it is resource consuming on the client side!
 */
@@ -126,11 +180,11 @@ $rcmail_config['cal_previews'] = 2;
 
 /* cron */
 $rcmail_config['cron_log'] = true;
-$rcmail_config['cron_smtp_user'] = 'dummy@mail4us.net'; //smtp user
+$rcmail_config['cron_smtp_user'] = 'dummy@mydomain.tld'; //smtp user
 $rcmail_config['cron_smtp_pass'] = 'pass'; //smtp password
 $rcmail_config['cron_rc_url'] = 'http://where_is_roundcube/'; //trailing slash !!!
 $rcmail_config['cron_ip'] = '127.0.0.1'; //please use real IP
-$rcmail_config['cron_sender'] = 'noreply@mail4us.net';
+$rcmail_config['cron_sender'] = 'noreply@mydomain.tld';
 
 /* link colors for jquery-ui accordions 
    set according to your css */
@@ -140,10 +194,6 @@ $rcmail_config['rgblinkcolor'] = 'rgb(33, 33, 33)';
 // use jqueryui theme
 $rcmail_config['ui_theme_main_cal'] = true; // true is recommended
 $rcmail_config['ui_theme_upcoming_cal'] = false; // false is recommended
-
-// possible values: 'mycalendar'   show only the user's calendar as default
-//                  'allcalendars' show all layers as default
-$rcmail_config['default_calendar'] = 'mycalendar';
 
 // default calendar view (agendaDay, agendaWeek, month)
 $rcmail_config['default_view'] = "agendaWeek";
@@ -162,12 +212,14 @@ $rcmail_config['first_hour'] = -1;
 // default category
 $rcmail_config['default_category'] = 'c0c0c0';
 
+// label for default category
+$rcmail_config['default_category_label'] = utf8_encode('Default');
+
 // default font color ('complementary' or 'blackwhite')
 $rcmail_config['default_font_color'] = 'blackwhite';
 
-// event categories (can be modified by user)
+// default event categories (additional to 'default_category' / can be modified by user)
 $rcmail_config['categories'] = array(
-  'Personal' => '19F7FF', 
   'Work' => 'ff0000',
   'Family' => '00ff00',
   'Holidays' => 'ff6600',

@@ -1,5 +1,6 @@
 TODOS:
 
+- Remove compose_newwindow support
 - dtstart_unixtime ???
 - categories "Keine" ???
 - replace recurring by recurs in the entire code

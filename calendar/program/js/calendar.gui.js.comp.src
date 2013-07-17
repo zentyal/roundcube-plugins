@@ -1,13 +1,33 @@
 /* GUI */
 function calendar_gui(){
-  if(window.rcmail)
+  if(window.rcmail){
     rcmail.env.calendar_gui_initialized = false;
+  }
+  
+  this.minimalmode = function(){
+    if(typeof rcmail.get_cookie != 'undefined' && rcmail.env.skin == 'larry'){
+      var minmode = rcmail.get_cookie('minimalmode');
+      if(typeof rcmail.get_cookie != 'undefined' && (parseInt(minmode) || (minmode === null && $(window).height() < 850))){
+        $('#mainscreen').css('top', '85px');
+        $('#calendaroverlay').css('top', '85px');
+        $('#calendar-header').css('top', '85px');
+        $('#messagetoolbar').css('top', '45px');
+        $('#todaybutton').css('top', '55px');
+        $('#calquicksearchbar').css('top', '55px');
+      }
+      else{
+        $('#mainscreen').css('top', '110px');
+        $('#calendaroverlay').css('top', '110px');
+        $('#calendar-header').css('top', '110px');
+        $('#messagetoolbar').css('top', '69px');
+        $('#todaybutton').css('top', '80px');
+        $('#calquicksearchbar').css('top', '75px');
+      }
+      calendar_gui.adjustRight();
+    }
+  }
     
   this.init = function(response){
-    // compatibility check
-    if(!document.getElementById('event-1')){
-      document.writeln('Update to Roundcube v.0.5 or modify ./program/include/rcube_template.php <a href="http://trac.roundcube.net/ticket/1487133">Show the hack</a>');
-    }
     if(rcmail.env.calsearch_id){
       var search_event = $('#calendar').fullCalendar('clientEvents', rcmail.env.calsearch_id);
       if(search_event && search_event[0]){
@@ -19,14 +39,14 @@ function calendar_gui(){
       rcmail.env.calsearch_id = false;
     }
     
-    // initialize GUI only once
+    /* initialize GUI only once */
     if(rcmail.env.calendar_gui_initialized){
       $('#upcoming').fullCalendar('removeEvents');
       //$('#upcoming').fullCalendar('addEventSource',$('#calendar').fullCalendar('clientEvents'));
       return;
     }
     rcmail.env.calendar_gui_initialized = true;
- 
+
     /* change date/view if passed by URL */
     if(queryString('_view') != 'false'){
       $('#calendar').fullCalendar( 'changeView', queryString('_view'));
@@ -53,6 +73,118 @@ function calendar_gui(){
         $('#calendar').fullCalendar('gotoDate', $.fullCalendar.parseDate(new Date(queryString('_date') * 1000)));
       }
     }
+    
+    /* subscriptions */
+    $('#subscriptiontoggle').click(function(){
+      if( $('#subscription-table-content').is(':visible')){
+        if($(this).prop('checked')){
+          $('.subscriptionchbox').prop('checked', true);
+          $(this).attr('title', rcmail.gettext('uncheckall', 'calendar'));
+        }
+        else{
+          $('.subscriptionchbox').prop('checked', false);
+          $(this).attr('title', rcmail.gettext('checkall', 'calendar'));
+        }
+        $('#calendaroverlay').show();
+        $('#calsearchfilter').val('');
+        rcmail.http_post('plugin.calendar_subscribe', $('#subscription_form').serialize());
+      }
+      else{
+        if($(this).prop('checked')){
+          $('.filterschbox').prop('checked', true);
+          $(this).attr('title', rcmail.gettext('uncheckall', 'calendar'));
+        }
+        else{
+          $('.filterschbox').prop('checked', false);
+          $(this).attr('title', rcmail.gettext('checkall', 'calendar'));
+        }
+        $('#calendaroverlay').show();
+        $('#calsearchfilter').val('');
+        rcmail.http_post('plugin.calendar_setfilters', $('#filters_form').serialize());
+      }
+    });
+    
+    $('.subscriptionchbox').click(function(){
+      if(!rcmail.env.replication_complete){
+        if($(this).prop('checked')){
+          $(this).prop('checked', false);
+        }
+        else{
+          $(this).prop('checked', true);
+        }
+        rcmail.display_message(rcmail.gettext('backgroundreplication', 'calendar'), 'error');
+        return;
+      }
+      if(rcmail.env.subscriptionsubmit){
+        window.clearTimeout(rcmail.env.subscriptionsubmit);
+      }
+      $('#calsearchfilter').val('');
+      var ido = this.id.replace('chbox_', 'option_');
+      var idf = this.id.replace('chbox_', 'filter_');
+      var idu = this.id.replace('chbox_', 'user_');
+      if($(this).prop('checked')){
+        $('#' + ido).show();
+        $('#' + idf).show();
+        $('.' + idf).show();
+        $('#' + idu).show();
+      }
+      else{
+        $('#' + ido).hide();
+        $('#' + idf).hide();
+        $('.' + idf).hide();
+        $('#' + idu).hide();
+      }
+      rcmail.env.subscriptiondata = $('#subscription_form').serialize();
+      rcmail.env.subscriptionsubmit = window.setTimeout("$('#calendaroverlay').show();rcmail.http_post('plugin.calendar_subscribe', rcmail.env.subscriptiondata);rcmail.env.subscriptiondata=false;rcmail.env.subscriptionsubmit=false", 2500);
+    });
+    
+    $('#subscriptions-table').mouseleave(function(){
+      if(rcmail.env.subscriptiondata){
+        if(rcmail.env.subscriptionsubmit){
+          window.clearTimeout(rcmail.env.subscriptionsubmit);
+          $('#calendaroverlay').show();
+          rcmail.http_post('plugin.calendar_subscribe', rcmail.env.subscriptiondata);
+          rcmail.env.subscriptiondata = false;
+          rcmail.env.subscriptionsubmit = false;
+        }
+      }
+    });
+    
+    $('#subscriptionlink').click(function(){
+      $('#filterslink').removeClass('subscriptionlink-selected');
+      $(this).addClass('subscriptionlink-selected');
+      $('#filters-table-content').hide();
+      $('#subscription-table-content').show();
+      calendar_gui.adjustLeft();
+      rcmail.http_post('plugin.calendar_subscription_view', '_view=subscriptions');
+    });
+    
+    /* filters */
+    $('#filterslink').click(function(){
+      $('#subscriptionlink').removeClass('subscriptionlink-selected');
+      $(this).addClass('subscriptionlink-selected');
+      $('#subscription-table-content').hide();
+      $('#filters-table-content').show();
+      calendar_gui.adjustLeft();
+      rcmail.http_post('plugin.calendar_subscription_view', '_view=filters');
+    });
+    
+    $('.filterschbox').click(function(){
+      if(!rcmail.env.replication_complete){
+        if($(this).prop('checked')){
+          $(this).prop('checked', false);
+        }
+        else{
+          $(this).prop('checked', true);
+        }
+        rcmail.display_message(rcmail.gettext('backgroundreplication', 'calendar'), 'error');
+        return;
+      }
+      $('#calsearchfilter').val('');
+      data = $('#filters_form').serialize();
+      $('#calendaroverlay').show();
+      rcmail.http_post('plugin.calendar_setfilters', data);
+    });
     
     // initialize upcoming events
     this.upcoming(response);
@@ -103,7 +235,8 @@ function calendar_gui(){
     $('#todaybut').click(function() {
       $('#jqdatepicker').datepicker('setDate', new Date());
       $('#calendar').fullCalendar('today');
-      $('#upcoming').fullCalendar('today');
+      //$('#upcoming').fullCalendar('today');
+      rcmail.env.clientEvents = true;
     });
     $('#prevbut').click(function() {
       rcmail.env.onChangeMonthYear = false;
@@ -112,6 +245,7 @@ function calendar_gui(){
       var endselected = new Date();
       endselected.setTime(selected.getTime() + (86400 * 1000));
       $('#calendar').fullCalendar('select',selected,endselected,false);
+      rcmail.env.clientEvents = true;
     });
     $('#nextbut').click(function() {
       rcmail.env.onChangeMonthYear = false;
@@ -120,15 +254,19 @@ function calendar_gui(){
       var endselected = new Date();
       endselected.setTime(selected.getTime() + (86400 * 1000));
       $('#calendar').fullCalendar('select',selected,endselected,false);
+      rcmail.env.clientEvents = true;
     });
     $('#daybut').click(function() {
       $('#calendar').fullCalendar('changeView','agendaDay');
+      calendar_gui.adjustRight();
     });
     $('#weekbut').click(function() {
       $('#calendar').fullCalendar('changeView','agendaWeek');
+      calendar_gui.adjustRight();
     });
     $('#monthbut').click(function() {
       $('#calendar').fullCalendar('changeView','month');
+      calendar_gui.adjustRight();
     });
     $('#jqdatepicker').mousedown(function(){
       rcmail.env.onChangeMonthYear = true;
@@ -463,6 +601,9 @@ function calendar_gui(){
         day: response.settings['columnFormatDay']
       },
       theme: response.settings['ui_theme_upcoming'],
+      readyState: function(){
+
+      },
       editable: true,
       ignoreTimezone: false,
       //eventSources: calendar_common.eSources(response, true),
@@ -488,6 +629,56 @@ function calendar_gui(){
         calendar_callbacks.eventRender_upcoming(event, element, view, response);
       }
     });
+    this.adjustLeft();
+    $(window).resize(function(){
+      if($('#filters-table-content').get(0)){
+        var fudge = (Math.max($('#filters-table-content').position().top - $('#subscriptions-table').position().top, $('#subscription-table-content').position().top - $('#subscriptions-table').position().top)) + 1;
+        $('#subscriptions-table').css('max-height', '226px');
+        $('#subscription-table-content').css('max-height', (226 - fudge) + 'px');
+        $('#filters-table-content').css('max-height', (226 - fudge) + 'px');
+      }
+      calendar_gui.adjustLeft();
+      window.setTimeout("calendar_gui.adjustRight();", 200);
+    });
+  }
+  
+  /* adjust left pane */
+  this.adjustLeft = function(){
+    if(rcmail.env.skin != 'classic'){
+      if($('#filters-table-content').get(0)){
+        var availh = $('#sectionslist').height() - $('#sectionslist').position().top - $('#subscriptions-table').position().top - 150;
+        if(availh > $('#subscriptions-table').height()){
+          var fudge = (Math.max($('#filters-table-content').position().top - $('#subscriptions-table').position().top, $('#subscription-table-content').position().top - $('#subscriptions-table').position().top)) + 1;
+          $('#subscriptions-table').css('max-height', availh + 'px');
+          $('#subscription-table-content').css('max-height', (availh - fudge) + 'px');
+          $('#filters-table-content').css('max-height', (availh - fudge) + 'px');
+        }
+      }
+      else{
+        $('#subscriptions-table').hide();
+      }
+      $('#upcoming').css('top', $('#upcoming-maincontainer').position().top + 'px');
+      $('.fc-view-basicDay').height($('#upcoming').height());
+    }
+  }
+  
+  /* adjust right pane */
+  this.adjustRight = function(){
+    try{
+      if($('.fc-agenda-divider').position()){
+        $('.fc-agenda-divider').next().height($('.calstatusbar').position().top - $('.fc-agenda-divider').position().top - 45);
+      }
+    }
+    catch(e){
+      if($('.fc-agenda-divider').position()){
+        $('.fc-agenda-divider').next().height(Math.round($('#calendar').height() - $('.fc-agenda-divider').position().top - 17));
+      }
+    }
+    $('.fc-content').height($('#calendar').height());
+    $('.fc-view-' + $('#calendar').fullCalendar("getView").name).height($('#calendar').height());
+    $('.fc-view-' + $('#calendar').fullCalendar("getView").name + ' table:first-child').attr('style', 'width: 100%; height: 100%;');
+    $('hr.timeline').remove();
+    calendar_callbacks.setTimeline();
   }
   
   /* init Tabs widget */
@@ -588,7 +779,6 @@ function calendar_gui(){
         temparr = dateText.split("-");
         var mydate = new Date(temparr[0],temparr[1]-1,temparr[2]);
         $('#calendar').fullCalendar( 'gotoDate', $.fullCalendar.parseDate(mydate));
-        $('#upcoming').fullCalendar( 'gotoDate', $.fullCalendar.parseDate(mydate));
         var selected = new Date($.fullCalendar.parseDate(mydate));
         var endselected = new Date();
         endselected.setTime(selected.getTime() + (86340 * 1000));

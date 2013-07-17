@@ -66,7 +66,6 @@ class CalDAVClient {
     $this->auth = $auth;
     $this->headers = array();
     $this->debug = $debug;
-    
     if ( preg_match( '#^(https?)://([a-z0-9.-]+)(:([0-9]+))?(/.*)$#', $base_url, $matches ) ) {
       $this->server = $matches[2];
       $this->base_url = $matches[5];
@@ -397,13 +396,23 @@ class CalDAVClient {
 $filter
 </C:calendar-query>
 EOXML;
-    $this->DoXMLRequest( 'REPORT', $xml, $relative_url );
+    $response = $this->DoXMLRequest( 'REPORT', $xml, $relative_url );
+    // Workaroud for servers which do not add xml tag at the begin of the body (Calypso)
+    if(!$this->xmlResponse){
+      $temp = explode("\r\n\r\n", $response);
+      if(count($temp) > 1){
+        $this->httpResponse = trim($temp[count($temp) - 2]);
+        $this->xmlResponse =  '<?xml version="1.0"?>' . trim($temp[count($temp) - 1]);
+      }
+      else{
+        $this->httpResponse = trim($response);
+      }
+    }
     $xml_parser = xml_parser_create_ns('UTF-8');
     $this->xml_tags = array();
     xml_parser_set_option ( $xml_parser, XML_OPTION_SKIP_WHITE, 0 );
     xml_parse_into_struct( $xml_parser, $this->xmlResponse, $this->xml_tags );
     xml_parser_free($xml_parser);
-
     $report = array();
     foreach( $this->xml_tags as $k => $v ) {
       switch( $v['tag'] ) {
@@ -411,7 +420,7 @@ EOXML;
           if ( $v['type'] == 'open' ) {
             $response = array();
           }
-          elseif ( $v['type'] == 'close' ) {
+          elseif ( $v['type'] == 'close') {
             $report[] = $response;
           }
           break;
@@ -429,6 +438,96 @@ EOXML;
     return $report;
   }
 
+  function GetCollection() {
+    $xml = '<?xml version="1.0" encoding="utf-8" ?><A:propfind xmlns:A="DAV:"><A:prop><A:current-user-principal/></A:prop></A:propfind>';
+    $response = $this->DoXMLRequest('PROPFIND', $xml);
+    $temp = explode("\r\n\r\n<?xml", $response, 2);
+    if(!$temp[1]) return false;
+    $xml = '<?xml' . $temp[1];
+    $response = $this->clean_response($xml);
+    try{
+      $xml = new SimpleXMLElement($response);
+    }
+    catch (Exception $e){
+      return false;
+    }
+    if(!isset($xml->response[0])){
+      $xml->response[0] = $xml->response;
+    }
+    if(isset($xml->response[0]->propstat->prop->{'current-user-principal'}->href[0])){
+      $principal = (string) $xml->response->propstat->prop->{'current-user-principal'}->href[0];
+      $xml = '<?xml version="1.0" encoding="utf-8" ?><A:propfind xmlns:B="urn:ietf:params:xml:ns:caldav" xmlns:A="DAV:"><A:prop><B:calendar-home-set/></A:prop></A:propfind>';
+      $this->SetDepth(1);
+      $this->base_url = '';
+      $response = $this->DoXMLRequest('PROPFIND', $xml, $principal);
+      $temp = explode("\r\n\r\n<?xml", $response, 2);
+      if(!$temp[1]) return false;
+      $xml = '<?xml' . $temp[1];
+      $response = $this->clean_response($xml);
+      try{
+        $xml = new SimpleXMLElement($response);
+      }
+      catch (Exception $e){
+        return false;
+      }
+      if(isset($xml->response[0]->propstat->prop->{'calendar-home-set'}->href[0])){
+        $collection = (string) $xml->response->propstat->prop->{'calendar-home-set'}->href[0];
+        $this->SetDepth(1);
+        $response = $this->DoXMLRequest('PROPFIND', null, $collection);
+        $temp = explode("\r\n\r\n<?xml", $response, 2);
+        if(!$temp[1]) return false;
+        $xml = '<?xml' . $temp[1];
+        $response = $this->clean_response($xml);
+        try{
+          $xml = new SimpleXMLElement($response);
+        }
+        catch (Exception $e){
+          return false;
+        }
+        if(is_object($xml->response)){
+         foreach($xml->response as $calendar){
+            if(isset($calendar->propstat->prop->resourcetype->calendar)){
+              $calendar = (string) $calendar->href[0];
+              if(urlencode(urldecode($calendar)) != urlencode(urldecode($collection))){
+                $this->SetDepth(0);
+                $xml = '<?xml version="1.0" encoding="utf-8"?>
+<x0:propfind xmlns:x1="http://calendarserver.org/ns/" xmlns:x0="DAV:" xmlns:x3="http://apple.com/ns/ical/" xmlns:x2="urn:ietf:params:xml:ns:caldav">
+ <x0:prop>
+  <x0:displayname/>
+  <x3:calendar-color/>
+ </x0:prop>
+</x0:propfind>';
+                $response = $this->DoXMLRequest('PROPFIND', $xml, $calendar);
+                $temp = explode("\r\n\r\n<?xml", $response, 2);
+                if(!$temp[1]) return false;
+                $xml = '<?xml' . $temp[1];
+                $array = $this->xml2array($xml);
+                $calendar = urldecode($calendar);
+                $calendars[$calendar]['displayname'] = $array[0][1][0][0]['value'];
+                $calendars[$calendar]['color'] = $array[0][1][0][1]['value'];
+                $calendars[$calendar]['url'] = $calendar;
+              }
+            }
+          }
+          if(is_array($calendars)){
+            return $calendars;
+          }
+          else{
+            return false;
+          }
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
+  }
 
   /**
   * Get the events in a range from $start to $finish.  The dates should be in the
@@ -458,7 +557,6 @@ EOXML;
     </C:comp-filter>
   </C:filter>
 EOFILTER;
-
     return $this->DoCalendarQuery($filter, $relative_url);
   }
   
@@ -654,7 +752,53 @@ EOFILTER;
     $out = "Authorization: Digest username=\"" . $this->user . "\", realm=\"$drealm\", qop=\"auth\", algorithm=\"MD5\", uri=\"/$file\", nonce=\"$nonce\", nc=00000001, cnonce=\"$cnonce\", opaque=\"$opaque\", response=\"$response\"";
     return $out;
   }
-
+  
+  function clean_response($response) {
+    $response = utf8_encode($response);
+    $response = str_replace('D:', null, $response);
+    $response = str_replace('d:', null, $response);
+    $response = str_replace('C:', null, $response);
+    $response = str_replace('c:', null, $response);
+    $response = str_replace('cal:', null, $response);
+    return $response;
+  }
+  
+  function xml2array($xml) {
+    $opened = array(); 
+    $opened[1] = 0; 
+    $xml_parser = xml_parser_create(); 
+    xml_parse_into_struct($xml_parser, $xml, $xmlarray); 
+    $array = array_shift($xmlarray); 
+    unset($array["level"]); 
+    unset($array["type"]); 
+    $arrsize = sizeof($xmlarray); 
+    for($j=0;$j<$arrsize;$j++){ 
+        $val = $xmlarray[$j]; 
+        switch($val["type"]){ 
+            case "open": 
+                $opened[$val["level"]]=0; 
+            case "complete": 
+                $index = ""; 
+                for($i = 1; $i < ($val["level"]); $i++) 
+                    $index .= "[" . $opened[$i] . "]"; 
+                $path = explode('][', substr($index, 1, -1)); 
+                $value = &$array; 
+                foreach($path as $segment) 
+                    $value = &$value[$segment]; 
+                $value = $val; 
+                unset($value["level"]); 
+                unset($value["type"]); 
+                if($val["type"] == "complete") 
+                    $opened[$val["level"]-1]++; 
+            break; 
+            case "close": 
+                $opened[$val["level"]-1]++; 
+                unset($opened[$val["level"]]); 
+            break; 
+        } 
+    }
+    return $array;
+  }
 }
 
 /**

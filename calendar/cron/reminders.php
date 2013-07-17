@@ -352,7 +352,11 @@ foreach($notifiers as $key => $notifier){
       );
       $events_table = $rcmail->config->get('db_table_events', 'events');
       $db_table = str_replace('_caldav','',$events_table);
-      $map = $rcmail->config->get('backend_db_table_map',array());
+      $default = array(
+        'database' => '', // default db table
+        'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
+      );
+      $map = $rcmail->config->get('backend_db_table_map', $default);
       if($notifier['backend'] == 'caldav'){
         $db_table .= $map['caldav'];
       }

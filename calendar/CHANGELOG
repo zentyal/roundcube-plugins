@@ -1,34 +1,43 @@
 VERSION                COMMENT
-----------------------------------------------------------------------------------------
-10.0                   - Moved advanced features to calendar_plus plugin
-                       - Separated jQuery timepicker code
-10.0.1                 - Added timepicker plugin to required plugins
-10.0.2                 - Bug fix: Don't save empty categories
-10.0.3                 - CSS fix for #sectionslist
-                       - Moved some images to calendar_plus
-10.0.4                 - Escape '?' in events dialog inputs
-10.0.5                 - Fixed scrollbars on left div (Larry skin)
-10.0.6                 - Don't save ctags in case of loading a layer
-11.0                   - Shared calendars via CalDAV (requires calendar_plus + sabredav)
-11.0.1                 - Prevent overwriting user settings when switching to a
-                         shared (readonly) calendar
-11.0.2 - 11.0.4        - Code clean up
-11.0.5                 - Bug fix for owncloud (implemented SabreDAV 1.6.x backwards
-                         compatibilty)
-11.0.6 - 11.0.8        - Code clean up
-11.0.9                 - Fixed a bug if categories contained blanks or apostrophs
-11.0.10 - 11.0.13      - Code clean up
-11.0.14                - Fixed a bug when moving events from default category to a
-                         category linked with a CalDAV
-11.0.15 - 11.0.16      - Improved cron jobs (deny access if remote IP <> cron_ip)
-11.0.17                - Fixed buttons previous and next day
-11.0.18                - Fixed illegal string offset warning in utils.php
-11.0.19                - Fixed method detection in caldav.php
-11.0.20                - Added Happy Birthday email feature
-11.0.21                - Added 'scheduled_sending' support
-11.0.22                - Set referrer for remote requests
-11.0.23                - Fixed a bug if description contained \n
-11.0.24 - 11.0.26      - Shorten ICS vcard valarm properties
-11.0.27                - Use $rcmail->user->data instead of $_SESSION
-11.0.28                - Some more comments in config.inc.php.dist
-11.0.29 - 11.0.30      - Bug fix if savepassword plugin is not installed
+---------------------------------------------------------------------------------------------------------------------
+12.0                   - Roundcube 0.9 compatibility
+12.0.1 - 12.0.2        - Roundcube 0.9 toggle minimalmode implemenation
+12.0.3 - 12.0.4        - Fix a bug in public_caldavs handling
+13.0                   - v13.x is now Roundcube 0.9 branch, v12.0 is reserved for Roundcube 0.8 branch
+13.0.1                 - Fix category display for public calendarfeeds
+14.0                   - Compatibility with 0.8 and 0.9 branch
+14.0.1                 - Fixed upload directory bug
+14.0.2                 - Added compose new window support (Roundcube 0.9 branch)
+14.0.3                 - Don't lowercase default CalDAV URL
+14.0.4                 - Fixed loading message bug in print view
+                       - default category background color is now changeable by user
+14.0.5                 - Added default CalDAVs configuration example to config.inc.php.dist
+14.0.6                 - Disallow adding events to public categories
+14.0.7                 - calendar_plus related changes
+14.0.8                 - Display layers by default (config 'default_calendar' -> 'allcalendars')
+14.0.9                 - Color of public caldavs is now customizable on a per user level
+                         (import if different skins are available)
+14.0.10                - Subscribe/unsubscribe public caldavs
+14.1                   - Complete subscription implementation
+14.1.1                 - Render calendar properly on window resize
+14.1.2                 - Include blank.gif
+14.1.3                 - Fixed javascript bugs if calendar_plus is not installed
+14.1.4                 - Fixed overlap issue of calendar filters/subscriptions
+14.1.5                 - Bug fix related to 0.8.6 compatibilty
+14.1.6                 - Bug fix (default view = month throwed javascript error and broke entire GUI)
+14.1.7                 - New config option to hide basic day agenda in calendar view ('hide_agenda_day_basic')
+14.2                   - Import events into selectable calendars/categories (caldav_plus)
+14.2.1                 - Fixed a bug if caldav_plus is not available
+14.2.2                 - carddav_plus related compatibility changes
+14.2.3                 - Default category is now fully customizeable
+14.2.4                 - Handle line breaks in ics attachments
+14.2.5                 - Search: Find events with default category
+14.2.6                 - Fix: Invalid argument supplied for foreach() in ./plugins/calendar/calendar.php on line 3217
+14.2.7                 - Implemented workaround for servers which do not add xml tag at the begin of the body (Calypso)
+14.3 - 14.3.1          - Implemented TZID (CalDAV)
+14.3.2                 - Added support for %gu and %gp placeholders in CalDAV-URLs
+15.0                   - Implemented database versioning
+15.0.1                 - If CalDAV password is equal to SESSION password the save placeholder %p
+15.0.2                 - Fix error log entry when '0' is written into a datetime database field
+15.0.3                 - Improve performance in settings task
+15.0.4 - 15.0.6        - GUI improvements

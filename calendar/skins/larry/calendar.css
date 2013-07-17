@@ -257,9 +257,9 @@ table.records-table {
   margin: 0 auto;
   position: absolute;
   top: 20px;
-  /*bottom: 25px;*/
-  left: 0px;
-  right: 0px;
+  left: 0;
+  right: 0;
+  height: 100%;
   overflow: auto;
 }
 
@@ -284,8 +284,86 @@ table.records-table {
   font-size: 11px;
 }
 
-#upcoming {
-  margin: 0 auto;
+#jqdatepicker {
+  min-height: 161px;
+}
+
+#subscriptiontoggle-content {
+  float: left;
+  margin-left: -2px;
+}
+
+a.subscriptionlink {
+  padding: 0 4px 7px 4px;
+  border-top: 2px solid #ccc;
+  border-right: 2px solid #ccc;
+  border-left: 2px solid #ccc;
+  border-top-left-radius: 3px;
+  -moz-border-top-left-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -moz-border-top-right-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  text-decoration: none;
+}
+
+a.subscriptionlink-selected {
+  color: #666666;
+  border-top: 2px solid #c0c0c0;
+  border-right: 2px solid #c0c0c0;
+  border-left: 2px solid #c0c0c0;
+  background-color: #d0d0d0;
+  text-decoration: underline;
+}
+
+a.subscriptionlink:hover {
+  color: #666666;
+  border-top: 2px solid #c0c0c0;
+  border-right: 2px solid #c0c0c0;
+  border-left: 2px solid #c0c0c0;
+  background-color: #c0c0c0;
+  text-decoration: underline;
+}
+
+#subscriptions-table .boxtitle {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+#subscriptions-table {
+  width: 100%;
+  max-height: 276px;
+  overflow: hidden;
+  background: #F9F9F9;
+}
+
+#subscription-table-content, #filters-table-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 250px;
+}
+
+#subscription-table-content div {
+  width: 22px;
+  height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 1px 1px 12px #999;
+  -webkit-box-shadow: #999 1px 1px 12px;
+}
+
+#filters-table-content div {
+  width: 22px;
+  height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-box-shadow: 1px 1px 12px #999;
+  -webkit-box-shadow: #999 1px 1px 12px;
 }
 
 #upcoming-maincontainer {
@@ -296,9 +374,21 @@ table.records-table {
   background: #e4e4e4;
 }
 
+#upcoming {
+  position: absolute;
+  width: 210px;
+  top: 500px;
+  bottom: 0;
+  left: 0;
+}
+
+.fc-view-basicDay {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 #sectionslist {
   width: 210px;
-  overflow: hidden;
 }
 
 #prefs-box {
@@ -365,8 +455,7 @@ pre {
 }
 
 #event,
-#calswitch,
-#calfilter {
+#calswitch {
   display: none;
 }
 
@@ -388,6 +477,10 @@ pre {
   border-color: #ffc;
   color: #000;
   border: 1px solid #ccc;
+}
+
+.ui-accordion .ui-accordion-header .ui-icon {
+  left: -.4em;
 }
 
 .ui-widget-header,

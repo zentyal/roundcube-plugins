@@ -29,7 +29,7 @@ function calendar_callbacks(){
       var left = 0;
       var width, dayCol;
       if(curCalView.name == "agendaWeek"){
-        dayCol = $(".fc-today:visible");
+        dayCol = $("#calendar .fc-today:visible");
         try{
           left = dayCol.position().left;
           width = dayCol.width() + 'px';
@@ -364,8 +364,12 @@ function calendar_callbacks(){
     }
     $('#catprotected').remove();
     var $dialogContent = $("#event");
-    if($dialogContent.dialog('isOpen') === true)
-      return;
+    try{
+      if($dialogContent.dialog('isOpen') === true)
+        return;
+    }
+    catch(e){
+    }
     if(!date){
       var date = new Date(date.getTime()/1000);
     }
@@ -422,7 +426,7 @@ function calendar_callbacks(){
     var buttons = {};
     buttons[save] = function() {
       // IE workaround
-      if(attach.val() != '' && attach.val() != rcmail.env.cal_lastimport){
+      if(attach.get(0) && attach.val() != ''){
         $dialogContent.dialog("close");
         $('#calendaroverlay').show();
         // start loading
@@ -435,10 +439,14 @@ function calendar_callbacks(){
           $('#calendar').fullCalendar('refetchEvents');
           rcmail.set_busy(false,'loading',rcmail.env.calendar_msgid);
           $('#calendaroverlay').hide();
-          rcmail.env.cal_lastimport = attach.val();
           attach.val('');
         });
         return false;
+      }
+      else{
+        if($('#event-3').is(':visible')){
+          return false;
+        }
       }
       var starttime = $.trim($('#starttime').val());
       var startdate = $.trim($('#startdate').val());
@@ -613,7 +621,7 @@ function calendar_callbacks(){
       $dialogContent.dialog("close");
     };
     $dialogContent.dialog({
-       modal: false,
+       modal: true,
        // find me: autodetect
        width: 630,
        position: 'center',

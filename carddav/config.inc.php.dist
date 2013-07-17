@@ -14,6 +14,13 @@ $rcmail_config['show_empty_database_addressbooks'] = false;
 /* CardDAV database tables */
 $rcmail_config['db_table_carddav_server'] = 'carddav_server';
 $rcmail_config['db_table_carddav_contacts'] = 'carddav_contacts';
+$rcmail_config['db_table_carddav_contactproups'] = 'carddav_contactgroups';
+$rcmail_config['db_table_carddav_contactproupmembers'] = 'carddav_contactgroupmembers';
+
+/* CardDAV database tables sequences (PostgreSQL) */
+$rcmail_config['db_sequence_carddav_server'] = 'carddav_server_carddav_server_id_seq';
+$rcmail_config['db_sequence_carddav_contacts'] = 'carddav_contacts_carddav_contact_id_seq';
+$rcmail_config['db_sequence_carddav_contactproups'] = 'carddav_contactgroups_contactgroup_id_seq';
 
 /* Debug (extended logging) */
 $rcmail_config['carddav_debug'] = false;
@@ -26,12 +33,6 @@ $rcmail_config['max_carddavs'] = 5;
 
 /* Sync CardDAVs every (x) minutes automatically (0 = on login only) */
 $rcmail_config['sync_carddavs_interval'] = 5;
-
-/* Slow servers
-   CAUTION: This method is not failsafe but speeds up things a little bit */
-$rcmail_config['carddav_slow_backends'] = array(
-  'google.com' => 5, // assume vcard created/updated after (x) secs.
-);
 
 /* Host where passwords are in sync with IMAP passwords */
 $rcmail_config['carddav_synced_passwords'] = array(

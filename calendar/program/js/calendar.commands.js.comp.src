@@ -3,7 +3,6 @@ function calendar_commands(){
   this.init = function(){
     rcmail.register_command('plugin.calendar_newevent', calendar_commands.newevent, true);
     rcmail.register_command('plugin.calendar_reload', calendar_commands.reload, true); 
-    rcmail.register_command('plugin.calendar_runTests', calendar_commands.runTests, true); 
     rcmail.register_command('plugin.calendar_switchCalendar', calendar_commands.switchCalendar, true);
     rcmail.register_command('plugin.exportEventsZip', calendar_commands.exportEventsZip, true);
     rcmail.register_command('plugin.importEvents', calendar_commands.importEvents, true);
@@ -45,6 +44,9 @@ function calendar_commands(){
     if(rcmail.env.compose_newwindow){
       opencomposewindowcaller(url);
     }
+    else if(rcmail.env.compose_extwin){
+      rcmail.open_compose_step(url);
+    }
     else{
       document.location.href = url;
     }
@@ -81,7 +83,10 @@ function calendar_commands(){
   
   /* reload the calendar */
   this.reload = function() {
-    rcmail.http_request('plugin.calendar_renew');
+    $('#calendaroverlay').hide();
+    var d = $('#calendar').fullCalendar('getDate');
+    d = Math.round(d.getTime()/1000, 0);
+    rcmail.http_request('plugin.calendar_renew', '_date=' + d);
   }
   
   /* schedule sync calendar */
@@ -95,11 +100,6 @@ function calendar_commands(){
     window.setTimeout('calendar_commands.syncCalendar()', 1000 * 60);
   }
 
-  /* run tests */
-  this.runTests = function() {
-    return true;
-  }
-  
   /* trigger search */
   this.triggerSearch = function() {
     var str = $("#calsearchfilter").val();
@@ -155,7 +155,7 @@ function calendar_commands(){
     }
     $('#jqdatepicker').datepicker('setDate', mydate);
     $('#calendar').fullCalendar('gotoDate', $.fullCalendar.parseDate(mydate));
-    $('#upcoming').fullCalendar('gotoDate', $.fullCalendar.parseDate(mydate));
+    //$('#upcoming').fullCalendar('gotoDate', $.fullCalendar.parseDate(mydate));
   }
   
   /* switch calendar */
@@ -174,16 +174,15 @@ function calendar_commands(){
     buttons[submit] = function() {
       $('#calendaroverlay').show();
       $dialogContent.dialog("close");
-      $('#calfilterscontainer input[type="checkbox"]').prop('checked', false);
-      $('#calfilterscontainer input[value="' + $('#_caluser').val() + '"]').prop('checked', true);
-      if($('#_caluser').val() == -1){
-         rcmail.http_post('plugin.calendar_setfilters', '_removelayers=1');
-      }
-      else if($('#_caluser').val() == 0){
+      $('#filters-table-content input[type="checkbox"]').prop('checked', false);
+      $('#filters-table-content input[value="' + $('#_caluser').val() + '"]').prop('checked', true);
+
+      if($('#_caluser').val() == 0){
          rcmail.http_post('plugin.calendar_setfilters', '_showlayers=1');
       }
       else{
-        rcmail.http_post('plugin.calendar_setfilters', $('#filter').serialize());
+        var data = $('#filters_form').serialize();
+        rcmail.http_post('plugin.calendar_setfilters', data);
       }
       rcmail.env.cal_search_string = '';
     };
@@ -215,7 +214,7 @@ function calendar_commands(){
     }
     $('#event').tabs('select',2);
     $('#event').tabs('disable', 0);
-    $('#ui-dialog-title-event').html(rcmail.gettext('calendar.import'));
+    $("#event").dialog("option", "title", rcmail.gettext('calendar.import'));
   }
   
   /* print preview */
@@ -235,40 +234,7 @@ function calendar_commands(){
   
   /* filter events */
   this.filterEvents = function() {
-    var $dialogContent = $("#calfilter");
-    var submit = rcmail.gettext('submit', 'calendar');
-    var cancel = rcmail.gettext('cancel', 'calendar');
-    var all    = rcmail.gettext('removefilters', 'calendar');
-    var buttons = {};
-
-    buttons[submit] = function() {
-      $('#calendaroverlay').show();
-      rcmail.http_post('plugin.calendar_setfilters',$('#filter').serialize());
-      rcmail.env.cal_search_string = '';
-      $dialogContent.dialog("close");
-    };
-    buttons[all] = function() {
-      $('#calendaroverlay').show();
-      $('#calfilter input[type=checkbox]').each(function() {
-        $(this).prop('checked', false);
-      });
-      rcmail.http_post('plugin.calendar_setfilters','');
-      rcmail.env.cal_search_string = '';
-      $dialogContent.dialog("close");
-    };
-    buttons[cancel] = function() {
-      $dialogContent.dialog("close");
-    };
-    $dialogContent.dialog({
-      modal: false,
-      title: rcmail.gettext('filter_events', 'calendar'),
-      width: 500,
-      close: function() {
-        $dialogContent.dialog("destroy");
-        $dialogContent.hide();
-      },
-      buttons: buttons
-    }).show();
+    $('#filterslink').trigger('click');
   }
   
   /* print events */

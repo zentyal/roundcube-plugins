@@ -68,12 +68,12 @@ if(window.rcmail){
     window.setTimeout('carddav_addressbook_trigger_sync()', 1000 * 60 * parseInt(rcmail.env.sync_carddavs_interval));
   }
   
-  if(rcmail.env.sync_carddavs_interval && parseInt(rcmail.env.sync_carddavs_interval) != 0){
-    //window.setTimeout('carddav_addressbook_trigger_sync()', 1000 * 6 * parseInt(rcmail.env.sync_carddavs_interval));
-    if(((rcmail.env.task == 'mail' && rcmail.env.action == '') || rcmail.env.task == 'addressbook') && rcmail.env.framed != true){
-      $(document).ready(function(){
+  $(document).ready(function(){
+    if(rcmail.env.sync_carddavs_interval && parseInt(rcmail.env.sync_carddavs_interval) != 0){
+      //window.setTimeout('carddav_addressbook_trigger_sync()', 1000 * 6 * parseInt(rcmail.env.sync_carddavs_interval));
+      if(((rcmail.env.task == 'mail' && rcmail.env.action == '') || rcmail.env.task == 'addressbook') && rcmail.env.framed != true){
         window.setTimeout('carddav_addressbook_trigger_sync();', 1000 * 5);
-      });
+      }
     }
-  }
+  });
 }

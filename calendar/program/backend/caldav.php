@@ -20,6 +20,9 @@ final class calendar_caldav extends Backend
   
   public function __construct($rcmail, $type) {
     $this->rcmail = $rcmail;
+    if(!class_exists('calendar_plus')){
+      $type = 'database';
+    }
     $this->type = $type;
     if ($rcmail->config->get('timezone') === "auto") {
       $tz = isset($_SESSION['timezone']) ? $_SESSION['timezone'] : date('Z')/3600;
@@ -37,22 +40,117 @@ final class calendar_caldav extends Backend
     $pass = $this->rcmail->config->get('caldav_password',$this->rcmail->encrypt('pass'));
     $auth = $this->rcmail->config->get('caldav_auth','basic');
     $extr = $this->rcmail->config->get('caldav_extr','1');
-    
     $account = array(
       'user' => $user,
       'pass' => $pass,
-      'url'  => $url,
+      'url'  => unslashify($url),
       'auth' => $auth,
       'extr' => $extr,
     );
     $this->account = $account;
-    $this->connect($account['url'], $account['user'], $account['pass'], $account['auth']);
+    $lastdetection = time() - $rcmail->config->get('collections_sync', 0);
+    if(is_array($_SESSION['detected_caldavs']) || $lastdetection < $rcmail->config->get('sync_collections', 0)){
+      $this->connect($account['url'], $account['user'], $account['pass'], $account['auth']);
+      $public_caldavs = $rcmail->config->get('public_caldavs', array());
+      foreach($public_caldavs as $category => $caldav){
+        $public_caldavs[$category]['pass'] = $rcmail->encrypt($caldav['pass']);
+      }
+      $caldavs = array_merge($rcmail->config->get('caldavs', array()), $public_caldavs);
+      $this->caldavs = $caldavs;
+      return;
+    }
+    $parsed = parse_url($account['url']);
+    $home = $parsed['scheme'] . '://' . $parsed['host'];
+    $account_url = unslashify(urldecode($this->account['url']));
+    list($u, $d) = explode('@', $rcmail->user->data['username']);
+    $account_url = str_replace('%su', $u, $account_url);
+    $account_url = str_replace('%u', $rcmail->user->data['username'], $account_url);
+    $googleuser = $rcmail->config->get('googleuser', 'john.doh@gmail.com');
+    $account_url = str_replace('%gu', $googleuser, $account_url);
+    $principal = $rcmail->config->get('caldav_principals', '/principals/users/%u');
+    $principal = str_replace('%su', $u, $principal);
+    $principal = str_replace('%u', $rcmail->user->data['username'], $principal);
+    $principal = str_replace('%gu', $googleuser, $principal);
+    $home = $rcmail->config->get('caldav_home', $home);
+    $this->connect($home . $principal, $account['user'], $account['pass'], $account['auth']);
+    $calendars = $this->caldav->GetCollection();
+    if(!$calendars){
+      $this->connect($home, $account['user'], $account['pass'], $account['auth']);
+      $calendars = $this->caldav->GetCollection();
+    }
+    $caldavs = array();
+    $colors =array();
+    $deleted = $rcmail->config->get('caldavs_removed', array());
+    if(is_array($calendars)){
+      foreach($calendars as $key => $calendar){
+        $calendar['url'] = strtolower(unslashify($home . $calendar['url']));
+        if(isset($deleted[$calendar['url']])){
+          continue;
+        }
+        $comp1 = str_replace($home, '', $calendar['url']);
+        $comp2 = str_replace($home, '', $account_url);
+        $comp1 = explode('/', $comp1);
+        $comp2 = explode('/', $comp2);
+        if(isset($comp1[4])){
+          unset($comp1[2]);
+          unset($comp1[3]);
+          unset($comp2[2]);
+          unset($comp2[3]);
+        }
+        $comp1 = implode('/', $comp1);
+        $comp2 = implode('/', $comp2);
+        $hidden = $rcmail->config->get('caldav_hidden_collections', array());
+        if(in_array($comp1, $hidden)){
+          continue;
+        }
+        if($calendar['url'] != $account_url && $comp1 != $comp2){
+          if($calendar['displayname']){
+            $category = $calendar['displayname'];
+          }
+          else if($calendars[$key]){
+            $temp = explode('/', $calendars[$key]);
+            $category = ucwords($temp[count($temp) - 1]);
+          }
+          if($calendar['color']){
+            $colors[$category] = substr($calendar['color'], 1);
+          }
+          $caldavs[$category] = array(
+            'user' => $this->account['user'],
+            'pass' => $this->account['pass'],
+            'url'  => $calendar['url'],
+            'auth' => $this->account['auth'],
+            'extr' => $this->account['extr'],
+          );
+        }
+      }
+    }
+    $_SESSION['detected_caldavs'] = $caldavs;
+    $detected_caldavs = $caldavs;
+    $conf = $rcmail->config->get('caldavs', array());
+    foreach($conf as $key1 => $caldav1){
+      foreach($caldavs as $key2 => $caldav2){
+        $caldav1['url'] = str_replace('%u', $rcmail->user->data['username'], $caldav1['url']);
+        $caldav2['url'] = str_replace('%u', $rcmail->user->data['username'], $caldav2['url']);
+        if($caldav1['url'] == $caldav2['url']){
+          if($key1 != $key2){
+            $sql = 'UPDATE ' . $this->table('events') . ' SET ' . $this->q('categories'). '=? WHERE ' . $this->q('user_id') . '=? AND ' . $this->q('url') . '=?';
+            $rcmail->db->query($sql, $key2, $rcmail->user->ID, $caldav2['url']);
+          }
+          unset($conf[$key1]);
+        }
+      }
+    }
+    $caldavs = array_merge($conf, $caldavs);
+    if($_SESSION['user_id']){
+      $categories = array_merge($rcmail->config->get('categories', array()), $colors);
+      $rcmail->user->save_prefs(array('caldavs' => $caldavs, 'categories' => $categories, 'detected_caldavs' => $detected_caldavs, 'collections_sync' => time()));
+    }
     $public_caldavs = $rcmail->config->get('public_caldavs', array());
     foreach($public_caldavs as $category => $caldav){
       $public_caldavs[$category]['pass'] = $rcmail->encrypt($caldav['pass']);
     }
-    $caldavs = array_merge($rcmail->config->get('caldavs', array()), $public_caldavs);
-    $this->caldavs = $caldavs;
+    $this->caldavs = array_merge($caldavs, $public_caldavs);
+    $this->connect($account['url'], $account['user'], $account['pass'], $account['auth']);
   }
   
   private function connect($url, $user, $pass, $auth = 'basic', $depth = true){
@@ -103,6 +201,10 @@ final class calendar_caldav extends Backend
         $url = str_replace('%gu', $googleuser, $url);
       if(strpos($url,'%u'))
         $url = str_replace('%u', $_SESSION['username'], $url);
+      if(strpos($url,'%su')){
+        list($u, $d) = explode('@', $_SESSION['username']);
+        $url = str_replace('%su', $u, $url);
+      }
       if(strpos($url, '?') === false)
         $url = slashify($url);
       if($url == "/"){
@@ -110,7 +212,7 @@ final class calendar_caldav extends Backend
       }
       if(!$auth)
         $auth = 'detect';
-      if($user != '%u' && $user != '%gu' && strpos($user, '%su') === false && $pass !='%p' && $pass != '%gp' && strpos($url, '%u') === false && strpos($url, '%gu') === false)
+      if($user != '%u' && $user != '%gu' && $user != '%su' && $pass !='%p' && $pass != '%gp' && strpos($url, '%u') === false && strpos($url, '%gu') === false)
         $ret = $this->caldav = new CalDAVClient(trim($url), trim($user), trim($pass), trim($auth), $rcmail->config->get('caldav_debug', false));
       if(!$ret){
         if(!$user)
@@ -187,7 +289,7 @@ final class calendar_caldav extends Backend
         if($ret){
           if(stripos($ret, 'HTTP/1.1') !== false){
             $code = $this->caldav->resultcode;
-            if($code == 403 || $code == 412){
+            if($code == 403 || $code == 404 || $code == 412){
               return false;
             }
             if($code == 201 || $code == 204 || $caldav_props[2] == '*'){
@@ -302,7 +404,87 @@ PROPP;
     return $ctags;
   }
   
-  public function searchEvents($str) {
+  public function newCalendar($account, $displayname, $color) {
+    if($this->type == 'caldav'){
+      $account['pass'] = $this->rcmail->decrypt($account['pass']);
+      if($account['pass'] == 'SESSION'){
+        $account['pass'] = $_SESSION['default_account_password'] ? $_SESSION['default_account_password'] : $_SESSION['password'];
+      }
+      else{
+        $account['pass'] = $this->rcmail->encrypt($account['pass']);
+      }
+      $this->connect($account['url'], $account['user'], $account['pass'], $account['auth'], false);
+      $xml = '<?xml version="1.0" encoding="utf-8" ?>
+<propfind xmlns="DAV:">
+  <prop>
+    <resourcetype/>
+  </prop>
+</propfind>';
+      $this->caldav->SetDepth(0);
+      $rsp = $this->caldav->DoXMLRequest("PROPFIND", $xml);
+      $temp = explode('http/1.1 ', strtolower($rsp));
+      foreach($temp as $idx => $code){
+        $code = substr($code, 0, 3);
+        if(!is_numeric($code)){
+          $code = '403';
+        }
+      }
+      if(substr($code, 0, 1) == 2){
+        return true;
+      }
+      $xml = '<?xml version="1.0" encoding="utf-8" ?>
+<D:mkcol xmlns:D="DAV:"xmlns:C="urn:ietf:params:xml:ns:caldav">
+  <D:set>
+    <D:prop>
+      <D:resourcetype>
+        <D:collection/> 
+        <C:calendar/>
+      </D:resourcetype>
+      <D:displayname>' . $displayname . '</D:displayname>
+    </D:prop>
+  </D:set>
+</D:mkcol>';
+      $this->caldav->SetDepth(1);
+      $rsp = $this->caldav->DoXMLRequest("MKCOL", $xml);
+      $this->connect($this->account['url'], $this->account['user'], $this->account['pass'], $this->account['auth'], true);
+      $temp = explode('http/1.1 ', strtolower($rsp));
+      foreach($temp as $idx => $code){
+        $code = substr($code, 0, 3);
+        if(!is_numeric($code)){
+          $code = '403';
+        }
+      }
+      if(substr($code, 0, 1) != 2){
+        return false;
+      }
+      else{
+        return true;
+      }
+    }
+  }
+  
+  public function removeCalendar($account) {
+    if($this->type == 'caldav'){
+      $account['pass'] = $this->rcmail->decrypt($account['pass']);
+      if($account['pass'] == 'SESSION' || !$account['pass']){
+        $account['pass'] = $_SESSION['default_account_password'] ? $_SESSION['default_account_password'] : $_SESSION['password'];
+      }
+      else{
+        $account['pass'] = $this->rcmail->encrypt($account['pass']);
+      }
+      $this->connect($account['url'], $account['user'], $account['pass'], $account['auth'], false);
+      $code = $this->caldav->DoDELETERequest('');
+      $this->connect($this->account['url'], $this->account['user'], $this->account['pass'], $this->account['auth'], true);
+      if(substr($code, 0, 1) != 2){
+        return false;
+      }
+      else{
+        return true;
+      }
+    }
+  }
+  
+  public function searchEvents($str, $label) {
     if(!empty($this->rcmail->user->ID)) {
       $cal_searchset = $this->rcmail->config->get('cal_searchset', array('summary'));
       $str = str_replace(array('\\'),array(''),$str);
@@ -314,8 +496,12 @@ PROPP;
         $sql_filter = " AND (" . $this->rcmail->db->ilike($cal_searchset[0], $wildcard.$str.$wildcard);
         if(count($cal_searchset) > 1){
           for($i=1;$i<count($cal_searchset);$i++){
-            if($cal_searchset[$i] != 'all_day')
+            if($cal_searchset[$i] != 'all_day'){
               $sql_filter .= " OR " . $this->rcmail->db->ilike($cal_searchset[$i], $wildcard.$str.$wildcard);
+              if($cal_searchset[$i] == 'categories' && stripos($this->rcmail->config->get('default_category_label', $label), $str) !== false){
+                $sql_filter .= " OR " . $this->q('categories') . "=''";
+              }
+            }
           }
           $sql_filter .= ")";
         }
@@ -332,60 +518,58 @@ PROPP;
           $key = md5(serialize($key));
           $results[$key] = $sql_arr;
         }
-        if(!$_SESSION['removelayers']){
-          $events_table = $this->rcmail->config->get('db_table_events', 'events');
-          $this->rcmail->config->set('db_table_events',$this->rcmail->config->get('db_table_events_cache', 'events_cache'));
-          $sql_result = $this->rcmail->db->query(
-            "SELECT * FROM ".$this->table('events').
-            " WHERE " . $this->q('del') . "<>1".
-            " AND " . $this->q('user_id') . "=?".
-            $sql_filter.
-            " ORDER BY " . $this->q('summary'),
-            $this->rcmail->user->ID);
-          while ($sql_result && ($sql_arr = $this->rcmail->db->fetch_assoc($sql_result))) {
-            $key = $sql_arr;
-            unset($key['event_id']);
-            $key = md5(serialize($key));
-            $results[$key] = $sql_arr;
-          }
-          $feeds = array_merge((array)$this->rcmail->config->get('public_calendarfeeds',array()),(array)$this->rcmail->config->get('calendarfeeds',array()));
-          foreach($feeds as $url => $category){
+        $events_table = $this->rcmail->config->get('db_table_events', 'events');
+        $this->rcmail->config->set('db_table_events',$this->rcmail->config->get('db_table_events_cache', 'events_cache'));
+        $sql_result = $this->rcmail->db->query(
+          "SELECT * FROM ".$this->table('events').
+          " WHERE " . $this->q('del') . "<>1".
+          " AND " . $this->q('user_id') . "=?".
+          $sql_filter.
+          " ORDER BY " . $this->q('summary'),
+          $this->rcmail->user->ID);
+        while ($sql_result && ($sql_arr = $this->rcmail->db->fetch_assoc($sql_result))) {
+          $key = $sql_arr;
+          unset($key['event_id']);
+          $key = md5(serialize($key));
+          $results[$key] = $sql_arr;
+        }
+        $feeds = (array)$this->rcmail->config->get('feeds_subscribed',array());
+        foreach($feeds as $url => $category){
+          $arr = parse_url($url);
+          if($arr['path'] == './'){
+            if($_SERVER['HTTPS'])
+              $https = 's';
+            else
+              $https = '';
+            $url = 'http' . $https . "://" . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . substr($url,1);
             $arr = parse_url($url);
-            if($arr['path'] == './'){
-              if($_SERVER['HTTPS'])
-                $https = 's';
-              else
-                $https = '';
-              $url = 'http' . $https . "://" . $_SERVER['HTTP_HOST'] . ':' . $_SERVER['SERVER_PORT'] . substr($url,1);
-              $arr = parse_url($url);
-            }
-            $con = '?';
-            if(strstr($url,'?'))
-              $con = '&';
-            if(stripos($arr['query'],'plugin.calendar_showlayer') && strtolower($arr['host']) == strtolower($_SERVER['HTTP_HOST'])){
-              $user_id = $this->rcmail->user->ID;
-              $temparr = explode('&',$arr['query']);
-              foreach($temparr as $key => $val){
-                if(strpos($val,'_userid=') === 0){
-                  $temp = explode("=",$val);
-                  $remote_user = $temp[1];
-                  $this->rcmail->user->ID = $remote_user;
-                  $sql_result = $this->rcmail->db->query(
-                    "SELECT * FROM ".$this->table('events').
-                    " WHERE " . $this->q('del') . "<>1".
-                    " AND " . $this->q('user_id') . "=?".
-                    $sql_filter.
-                    " ORDER BY " . $this->q('summary'),
-                    $this->rcmail->user->ID);
-                  while ($sql_result && ($sql_arr = $this->rcmail->db->fetch_assoc($sql_result))) {
-                    $key = $sql_arr;
-                    unset($key['event_id']);
-                    $key = md5(serialize($key));
-                    $results[$key] = $sql_arr;
-                  }
-                  $this->rcmail->user->ID = $user_id;
-                  break;
+          }
+          $con = '?';
+          if(strstr($url,'?'))
+            $con = '&';
+          if(stripos($arr['query'],'plugin.calendar_showlayer') && strtolower($arr['host']) == strtolower($_SERVER['HTTP_HOST'])){
+            $user_id = $this->rcmail->user->ID;
+            $temparr = explode('&',$arr['query']);
+            foreach($temparr as $key => $val){
+              if(strpos($val,'_userid=') === 0){
+                $temp = explode("=",$val);
+                $remote_user = $temp[1];
+                $this->rcmail->user->ID = $remote_user;
+                $sql_result = $this->rcmail->db->query(
+                  "SELECT * FROM ".$this->table('events').
+                  " WHERE " . $this->q('del') . "<>1".
+                  " AND " . $this->q('user_id') . "=?".
+                  $sql_filter.
+                  " ORDER BY " . $this->q('summary'),
+                  $this->rcmail->user->ID);
+                while ($sql_result && ($sql_arr = $this->rcmail->db->fetch_assoc($sql_result))) {
+                  $key = $sql_arr;
+                  unset($key['event_id']);
+                  $key = md5(serialize($key));
+                  $results[$key] = $sql_arr;
                 }
+                $this->rcmail->user->ID = $user_id;
+                break;
               }
             }
           }
@@ -394,7 +578,11 @@ PROPP;
           $prefs = unserialize($arr['preferences']);
           $events_table = $this->rcmail->config->get('db_table_events', 'events');
           $db_table = str_replace('_caldav','',$events_table);
-          $map = $this->rcmail->config->get('backend_db_table_map',array());
+          $default = array(
+            'database' => '', // default db table
+            'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
+          );
+          $map = $this->rcmail->config->get('backend_db_table_map', $default);
           if($prefs['backend'] == 'caldav'){
             $db_table .= $map['caldav'];
           }
@@ -462,7 +650,11 @@ PROPP;
   
   public function scheduleReminders($event){
     if (!empty($this->rcmail->user->ID) && $event) {
-      $map = $this->rcmail->config->get('backend_db_table_map');
+      $default = array(
+        'database' => '', // default db table
+        'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
+      );
+      $map = $this->rcmail->config->get('backend_db_table_map', $default);
       if(stripos($this->table('events'),$map['caldav'])){
         $col = 'caldav';
       }
@@ -580,7 +772,8 @@ PROPP;
     $remindertype=false,
     $remindermailto=false,
     $uid=false,
-    $client=false
+    $client=false,
+    $adjust = true
   ) {
     if (!empty($this->rcmail->user->ID)) {
       $srecur = (string) $recur;
@@ -620,7 +813,14 @@ PROPP;
       if(!$uid){
         $uid = $this->generateId();
       }
-      /* $uid = substr($uid, 0, 96); */ // find me: Why?
+      if($adjust){
+        $offset = $this->offset($start);
+        $start = $start + $offset;
+        $offset = $this->offset($end);
+        $end = $end + $offset;
+        $offset = $this->offset($expires);
+        $expires = $expires + $offset;
+      }
       $exists = $this->getEventByUID($uid, $recurrence_id);
       if(is_array($exists)){
         if($exists['del'] != '0'){
@@ -674,7 +874,8 @@ PROPP;
             $remindermailto,
             $allDay,
             false,
-            serialize(array(0 => $href, 1 => $etag, 2 => $uid))
+            serialize(array(0 => $href, 1 => $etag, 2 => $uid)),
+            $adjust
           );
         }
         else{
@@ -777,7 +978,8 @@ PROPP;
     $remindermailto=false,
     $allDay=false,
     $old_categories=false,
-    $caldav=false
+    $caldav=false,
+    $adjust = true
   ) {
     if (!empty($this->rcmail->user->ID)) {
       $srecur = $recur;
@@ -806,6 +1008,14 @@ PROPP;
         else{
           $this->url = $this->rcmail->config->get('caldav_url');
         }
+      }
+      if($adjust){
+        $offset = $this->offset($start);
+        $start = $start + $offset;
+        $offset = $this->offset($end);
+        $end = $end + $offset;
+        $offset = $this->offset($expires);
+        $expires = $expires + $offset;
       }
       $event = $this->getEvent($id);
       if(!$caldav){
@@ -908,6 +1118,10 @@ PROPP;
     $reminder
   ) {
     if (!empty($this->rcmail->user->ID)) {
+      $offset = $this->offset($start);
+      $start = $start + $offset;
+      $offset = $this->offset($end);
+      $end = $end + $offset;
       $query = $this->rcmail->db->query(
         "UPDATE " . $this->table('events') . " 
          SET ".$this->q('start')."=?, ".
@@ -943,6 +1157,10 @@ PROPP;
     $reminder
   ) {
     if (!empty($this->rcmail->user->ID)) {
+      $offset = $this->offset($start);
+      $start = $start + $offset;
+      $offset = $this->offset($end);
+      $end = $end + $offset;
       $query = $this->rcmail->db->query(
         "UPDATE " . $this->table('events') . " 
          SET ".$this->q('start')."=?, ".
@@ -1043,7 +1261,11 @@ PROPP;
         WHERE ".$this->q('user_id')."=?",
         $this->rcmail->user->ID
       );
-      $map = $this->rcmail->config->get('backend_db_table_map');
+      $default = array(
+        'database' => '', // default db table
+        'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
+      );
+      $map = $this->rcmail->config->get('backend_db_table_map', $default);
       $table = str_replace('`','',str_replace($map['caldav'], '', $this->table('events')));
       $this->rcmail->config->set('db_table_events', $table);
       $query = $this->rcmail->db->query(
@@ -1148,26 +1370,38 @@ PROPP;
   
   public function exportEvents($categories=false){
     if($this->type == 'caldav'){
-      $this->connect($this->account['url'], $this->account['user'], $this->account['pass'], $this->account['auth']);
-      $response = trim($this->caldav->DoRequest());
-      $temparr = explode("\r\n\r\n", $response);
-      $append = '';
-      // SabreDAV
-      if(substr($temparr[count($temparr) - 1], 0, 1) == '<'){
-        $append = '?export';
-      }
       if($categories){
         $caldavs = $this->caldavs;
         if(is_array($caldavs[$categories])){
-          $this->connect($caldavs[$categories]['url'].$append,$caldavs[$categories]['user'],$caldavs[$categories]['pass'],$caldavs[$categories]['auth']);
+          $this->connect($caldavs[$categories]['url'],$caldavs[$categories]['user'],$caldavs[$categories]['pass'],$caldavs[$categories]['auth']);
         }
       }
       else{
-        $this->connect($this->account['url'].$append, $this->account['user'], $this->account['pass'], $this->account['auth']);
+        $this->connect($this->account['url'], $this->account['user'], $this->account['pass'], $this->account['auth']);
       }
       $response = trim($this->caldav->DoRequest());
       $temparr = explode("\r\n\r\n", $response);
-      return $temparr[count($temparr) - 1];
+      if(strtoupper(substr($temparr[count($temparr) - 1], 0, strlen('BEGIN:VCALENDAR'))) != 'BEGIN:VCALENDAR'){
+        $append = '?export';
+        if($categories){
+          $caldavs = $this->caldavs;
+          if(is_array($caldavs[$categories])){
+            $this->connect($caldavs[$categories]['url'].$append,$caldavs[$categories]['user'],$caldavs[$categories]['pass'],$caldavs[$categories]['auth']);
+          }
+        }
+        else{
+          $this->connect($this->account['url'].$append, $this->account['user'], $this->account['pass'], $this->account['auth']);
+        }
+        $response = trim($this->caldav->DoRequest());
+        $temparr = explode("\r\n\r\n", $response);
+      }
+      if(strtoupper(substr($temparr[count($temparr) - 1], 0, strlen('BEGIN:VCALENDAR'))) == 'BEGIN:VCALENDAR'){
+        $return = $temparr[count($temparr) - 1];
+      }
+      else{
+        $return = "BEGIN:VCALENDAR\nEND:VCALENDAR";
+      }
+      return $return;
     }
   }
   
@@ -1179,7 +1413,11 @@ PROPP;
   ) {
     if($this->type == 'caldav'){
       $events = array();
-      $map = $this->rcmail->config->get('backend_db_table_map');
+      $default = array(
+        'database' => '', // default db table
+        'caldav' => '_caldav', // caldav db table (= default db table) extended by _caldav
+      );
+      $map = $this->rcmail->config->get('backend_db_table_map', $default);
       $ctags = $this->rcmail->config->get('ctags', array());
       if(stripos($this->table('events'),$map['caldav'])){
         $startYear  = date('Y',$estart);
@@ -1232,7 +1470,7 @@ PROPP;
             "UPDATE " . $this->table('events') . " 
             SET ".$this->q('timestamp')."=?, ".$this->q('notified')."=?
             WHERE ".$this->q('user_id')."=?",
-            '0',
+            '0000-00-00 00:00:00',
             '1',
             $this->rcmail->user->ID
           );
@@ -1592,7 +1830,7 @@ PROPP;
         "UPDATE " . $this->table('events') . " 
          SET ".$this->q('timestamp')."=?
          WHERE ".$this->q('user_id')."=?",
-        '0',
+        '0000-00-00 00:00:00',
         $this->rcmail->user->ID
       );
     }
@@ -1688,13 +1926,27 @@ PROPP;
     return $events;
   }
   
-  public function test($str = 'db_table_events') {
-    $this->rcmail->db->db_handle->loadModule('Manager');
-    if(!PEAR::isError($result = $this->rcmail->db->db_handle->listTableFields($this->rcmail->config->get($str))))
-      $ret = $result;
+  private function offset($time = 0){
+    $stz = date_default_timezone_get();
+    if($_SESSION['tzname'])
+      $tz = $_SESSION['tzname'];
+    else if(get_input_value('_btz', RCUBE_INPUT_GPC))
+      $tz = get_input_value('_btz', RCUBE_INPUT_GPC);
+    else if(get_input_value('_tz', RCUBE_INPUT_GPC))
+      $tz = get_input_value('_tz', RCUBE_INPUT_GPC);
     else
-      $ret = array();
-    return $ret;
+      $tz = $stz;
+    if($this->rcmail->config->get('timezone') != 'auto'){
+      $ctz = $this->rcmail->config->get('timezone');
+    }
+    else{
+      $ctz = $tz;
+    }
+    date_default_timezone_set($tz);
+    $offset = - date('Z', $time);
+    date_default_timezone_set($ctz);
+    $offset = $offset + date('Z', $time);
+    return - $offset;
   }
 }
 ?>
