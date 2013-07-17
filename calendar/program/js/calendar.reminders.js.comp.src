@@ -141,7 +141,7 @@ $(document).ready(function() {
     }
   }
   rcmail.addEventListener('init', function(evt) {
-    if((rcmail.env.action == 'compose' && rcmail.env.compose_newwindow === true) || rcmail.env.template =='terms'){
+    if((rcmail.env.action == 'compose' && (rcmail.env.compose_newwindow === true || rcmail.env.compose_extwin === true)) || rcmail.env.template =='terms'){
       //do not schedule reminders
     }
     else{

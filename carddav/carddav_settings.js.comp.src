@@ -10,6 +10,13 @@ if(window.rcmail){
         rcmail.display_message(rcmail.gettext('settings_delete_loading', 'carddav'), 'loading')
       );
     }, true);
+    rcmail.register_command('plugin.carddav-server-remove', function(carddav_server_id){
+      rcmail.http_post(
+        'plugin.carddav-server-delete',
+        '_remote=1&_remove=1&_carddav_server_id=' + $.base64Encode(carddav_server_id),
+        rcmail.display_message(rcmail.gettext('settings_delete_loading', 'carddav'), 'loading')
+      );
+    }, true);
     $('#_label').keypress(carddav_server_add_enter_event);
     $('#_server_url').keypress(carddav_server_add_enter_event);
     $('#_username').keypress(carddav_server_add_enter_event);

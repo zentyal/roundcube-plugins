@@ -1,16 +1,14 @@
 <?php
-
 /*
-+-----------------------------------------------------------------------+
-| ./plugins/calendar/localization/pl_PL.inc
-|
-| Language file of MyRoundcube Plugins Bundle
-| Copyright (C) 2010-2012, Roland 'rosali' Liebl
-|
-+-----------------------------------------------------------------------+
-| Author: myroundcube@mail4us.net - 03/16/2012 13:03:41
-+-----------------------------------------------------------------------+
-
+ +-----------------------------------------------------------------------+
+ | ./plugins/calendar/localization/pl_PL.inc
+ |
+ | Language file of MyRoundcube Plugins Bundle
+ | Copyright (C) 2010-2013, Roland 'rosali' Liebl
+ |
+ +-----------------------------------------------------------------------+
+ | Author: tomasz.chilinski@chilan.com - 06/22/2013 12:34:49
+ +-----------------------------------------------------------------------+
 */
 
 $labels = array();
@@ -19,6 +17,7 @@ $labels['plugindescription'] = 'Zarządzaj swoimi zdarzeniami przez Kalendarz-WW
 $labels['calendarprovider'] = 'Dostawca';
 $labels['forinstance'] = 'np.';
 $labels['caldavserver'] = 'Serwer CalDAV';
+$labels['caldavsettings'] = 'Ustawienia CalDAV';
 $labels['unlink_caldav'] = 'Aby usunąć tę kategorię, proszę najpierw odłączyć serwer CalDAV';
 $labels['caldavurl'] = 'URL CalDAV';
 $labels['passwordisset'] = 'Hasło jest ustawione';
@@ -30,6 +29,7 @@ $labels['workdays'] = 'Dni robocze';
 $labels['first_day'] = 'Pierwszy dzień tygodnia';
 $labels['categories'] = 'Kategorie';
 $labels['add_category'] = 'Dodaj kategorię';
+$labels['add_caldav'] = 'Dowiąż zasób CalDAV';
 $labels['remove_category'] = 'Usuń kategorię';
 $labels['calendar_feeds'] = 'Kalendarz RSS';
 $labels['feeds'] = 'Dostawcy kalendarzy';
@@ -57,6 +57,7 @@ $labels['event_deleted'] = 'Zdarzenie zostało usunięte';
 $labels['regards'] = 'Pozdrowienia,';
 $labels['administrator'] = 'Administrator';
 $labels['notify_footer'] = 'Otrzymałeś tego e-maila, bo zaznaczyłeś aby być informowanym o zmianach dokonanych przez uczestników w twoim kalendarzu. Nie odpowiadaj na tą wiadomość. W przypadku nieautoryzowanego dostępu lub nadyżuciu kaledarza, zamknij dostęp do kalendarza i poinformuj osoby, które miały do niego dostęp.';
+$labels['notify_details'] = 'Szczegóły wydarzenia:';
 $labels['minutes'] = 'minut';
 $labels['replicateautomatically'] = 'Replikuj bazę CalDAV co';
 $labels['caldavreplicationrange'] = 'Replikacja bazy CalDAV dla lat';
@@ -67,6 +68,10 @@ $labels['cal_notify'] = 'Wyślij email gdy zdarzenie się zmieni przez właścic
 $labels['caldav_notify'] = 'Wyślij email gdy zdarzenie się zmieni przez ';
 $labels['cal_notify_to'] = 'Odbiorca';
 $labels['showbirthdays'] = 'Pokaż urodziny';
+$labels['googleuser'] = 'Konto Google';
+$labels['googlepass'] = 'Hasło Google';
+$labels['googlepassisset'] = 'Hasło Google jest już wprowadzone';
+$labels['googlepassisnotset'] = 'Nie wprowadzono jeszcze hasła Google';
 $labels['googlecaptcha'] = 'Pozwól na dostęp do twojego konta google';
 $labels['clickhere'] = 'Klinij tutaj';
 $labels['titleFormatMonth'] = 'MMMM yyyy';
@@ -136,11 +141,11 @@ $labels['switch_calendar'] = 'Przełącz kalendarz';
 $labels['user'] = 'Użytkownicy';
 $labels['cal_user'] = 'Kalendarz użytkownika';
 $labels['submit'] = 'Zatwierdź';
-$labels['filter_events'] = 'Filtrowanie zdarzeń';
 $labels['filter'] = 'Flitry';
 $labels['allevents'] = 'wszystkie zdarzenia';
-$labels['removefilters'] = 'Usuń filtry';
+$labels['defaultcategorylabel'] = 'Domyślna etykieta kalendarza';
 $labels['defaultcategory'] = 'Brak';
+$labels['backgroundcolor'] = 'Kolor tła';
 $labels['general'] = 'Ogólne';
 $labels['schedule'] = 'Harmonogram';
 $labels['every'] = 'Każdy';
@@ -183,19 +188,21 @@ $labels['in'] = 'w';
 $labels['export_as_file'] = 'Jako plik';
 $labels['send_invitation'] = 'Jako zaproszenie';
 $labels['invitation_subject'] = 'Zaproszenie';
+$labels['custommail'] = 'Zaplanuj własny email';
 $labels['reminder_before'] = 'Przypomnij przez rozpoczęciem zdarzenia';
 $labels['removereminders'] = 'Usuń przypomnienia';
 $labels['remindersloading'] = 'Ładowanie przypomnień';
-$labels['reminderfooter'] = 'Otrzymałeś tego e-maila,bo zaznaczyłes aby otrzymać przypomnienie o nadchodzącym zdarzeniu w twoim kalendarzu.';
+$labels['reminderfooter'] = 'Otrzymałeś tego e-maila, bo zaznaczyłeś przypominanie o nadchodzącym zdarzeniu w twoim kalendarzu.';
 $labels['show_upcoming_cal'] = 'Włącz podgląd nadchodzących zdarzeń';
 $labels['invalidresponse'] = 'Niewłaściwa odpowiedź z';
 $labels['verifyexpiredate'] = 'Data wygaśnięcia jest niewłaściwa. Czy chcesz ją sprawdzić?';
-$labels['importconfirmation'] = 'Czy chcesz zaimportować dołączone zdarzenie(a) to Twojego kalendarza [%s element(ów)] ?';
+$labels['importconfirmation'] = 'Czy chcesz zaimportować dołączone zdarzenie(a) do Twojego kalendarza [%s element(ów)] ?';
 $labels['item'] = 'Element';
 $labels['errorsaving'] = 'Wystąpił błąd podczas zapisu';
 $labels['calreadonly'] = 'Ten kalendarz jest tylko do odczytu';
-$labels['mycalendar'] = 'mój Kalendarz';
 $labels['allcalendars'] = 'wszystkie Kalendarze';
+$labels['subscriptions'] = 'Subskrypcje';
+$labels['caldav'] = 'CalDAV';
 $labels['protected'] = 'chroniony';
 $labels['calsearch'] = 'Wyniki wyszukiwania';
 $labels['calsearchnomatches'] = 'Brak dopasowań';
@@ -203,13 +210,13 @@ $labels['properties'] = 'Właściwości';
 $labels['reload'] = 'Przeładuj kalendarz';
 $labels['sync'] = 'Synchronizuj';
 $labels['unloadwarning'] = 'Zmiany w bazie danych są niekompletne. Prosimy o pozostanie na tej stronie.';
-$labels['backgroundreplication'] = 'Replikacja w toku...';
-$labels['lastreplication'] = 'Ostatnia replikacja:';
+$labels['backgroundreplication'] = 'Synchronizacja w toku...';
+$labels['lastreplication'] = 'Ostatnia synchronizacja:';
 $labels['successfullyreplicated'] = 'Kalendarz został pomyślnie zreplikowany';
-$labels['replicationtimeout'] = 'Wystąpił timeout podczas replikacji';
-$labels['resumereplication'] = 'Przywróć replikację';
-$labels['replicationfailed'] = 'Wystąpił ostateczny błąd replikacji';
-$labels['replicationincomplete'] = 'Replikacja jest niekompletna';
+$labels['replicationtimeout'] = 'Wystąpiło przeterminowanie podczas synchronizacji';
+$labels['resumereplication'] = 'Wznów synchronizację';
+$labels['replicationfailed'] = 'Wystąpił ostateczny błąd synchronizacji';
+$labels['replicationincomplete'] = 'Synchronizacja jest niekompletna';
 $labels['reminders'] = 'Przypomnienia';
 $labels['reminder'] = 'Przypomnienie';
 $labels['externalreminders'] = 'Zewnętrzna usługa przypomnień (np. Google Calendar)';
@@ -240,6 +247,7 @@ $labels['editfuture'] = 'tylko to i następne zdarzenia';
 $labels['applyrecurring'] = 'Zastosuj zmiany do...';
 $labels['birthday'] = 'Urodziny';
 $labels['happybirthday'] = 'Życzenia z okazji urodzin';
+$labels['submenuprefix'] = '» ';
 $labels['undefined'] = '---';
 
 ?>

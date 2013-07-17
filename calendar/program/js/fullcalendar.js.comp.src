@@ -1742,6 +1742,11 @@ function setOuterHeight(element, height, includeMargins) {
 
 // TODO: curCSS has been deprecated (jQuery 1.4.3 - 10/16/2010)
 
+if(typeof $.curCSS != 'function'){
+  $.curCSS = function(elem, name, value){
+    return $(elem).css(name, value);
+  }
+}
 
 function hsides(element, includeMargins) {
 	return hpadding(element) + hborders(element) + (includeMargins ? hmargins(element) : 0);

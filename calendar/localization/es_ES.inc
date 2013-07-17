@@ -7,7 +7,7 @@
  | Copyright (C) 2010-2013, Roland 'rosali' Liebl
  |
  +-----------------------------------------------------------------------+
- | Author: Yoni - 02/19/2013 02:47:26
+ | Author: Yoni - 05/26/2013 23:55:13
  +-----------------------------------------------------------------------+
 */
 
@@ -17,6 +17,7 @@ $labels['plugindescription'] = 'Administrar sus eventos con el Calendario-Webmai
 $labels['calendarprovider'] = 'Proveedor';
 $labels['forinstance'] = 'p.e.';
 $labels['caldavserver'] = 'Servidor CalDAV';
+$labels['caldavsettings'] = 'Configuración CalDAV';
 $labels['unlink_caldav'] = 'Para eliminar esta categoría, por favor desvincule el servidor CalDAV primero.';
 $labels['caldavurl'] = 'Url CalDAV';
 $labels['passwordisset'] = 'Contraseña establecida';
@@ -28,6 +29,7 @@ $labels['workdays'] = 'Días laborables';
 $labels['first_day'] = 'Primer día de la semana';
 $labels['categories'] = 'Categorías';
 $labels['add_category'] = 'Añadir categoría';
+$labels['add_caldav'] = 'Vincular un recurso CalDAV';
 $labels['remove_category'] = 'Eliminar categoría';
 $labels['calendar_feeds'] = 'Canales de calendarios';
 $labels['feeds'] = 'RSS de Calendario';
@@ -55,6 +57,7 @@ $labels['event_deleted'] = 'Un evento ha sido eliminado';
 $labels['regards'] = 'Saludos,';
 $labels['administrator'] = 'Administrador';
 $labels['notify_footer'] = 'Usted ha recibido este correo electrónico porque ha optado por recibir una notificación cuando un asistente modifica eventos en sus calendarios. No responda a este mensaje. En el caso de acceso no autorizado o abuso, por favor, cierre o cambie el accesso a calendarios compartidos e informe a los asistentes consecuentemente.';
+$labels['notify_details'] = 'Detalles del evento:';
 $labels['minutes'] = 'Minutos';
 $labels['replicateautomatically'] = 'Replicar base de datos de todos los CalDAV';
 $labels['caldavreplicationrange'] = 'Replicar CalDAV para los años';
@@ -65,6 +68,10 @@ $labels['cal_notify'] = 'Enviar email cuando los eventos cambien';
 $labels['caldav_notify'] = 'Enviar notificación cuando eventos han sido cambiados por los asistentes';
 $labels['cal_notify_to'] = 'Receptor';
 $labels['showbirthdays'] = 'Mostrar cumpleaños';
+$labels['googleuser'] = 'Cuenta de Google';
+$labels['googlepass'] = 'Contraseña de Google';
+$labels['googlepassisset'] = 'Contraseña de Google está presente';
+$labels['googlepassisnotset'] = 'Introducir Contraseña de Google';
 $labels['googlecaptcha'] = 'Permitir acceso a tu cuenta de Google';
 $labels['clickhere'] = 'Haga clic aquí';
 $labels['titleFormatMonth'] = 'MMMM yyyy';
@@ -105,7 +112,7 @@ $labels['import_short'] = 'Importar';
 $labels['category'] = 'Categoría';
 $labels['preview'] = 'Previsualizar';
 $labels['location'] = 'Localización';
-$labels['default'] = 'Ninguno';
+$labels['default'] = 'Predeterminado';
 $labels['date'] = 'Fecha';
 $labels['start'] = 'Inicio';
 $labels['end'] = 'Fin';
@@ -127,18 +134,18 @@ $labels['choose_date'] = 'Escoja una fecha';
 $labels['click_here'] = 'Pulse aquí';
 $labels['removed'] = 'Se ha eliminado el evento posterior';
 $labels['edited_by'] = 'Modificado por';
-$labels['addicalmsg'] = 'Importar en calendario';
+$labels['addicalmsg'] = 'Importar todos los eventos al calendario';
 $labels['icalsavefailed'] = 'No ha sido posible importar el archivo de calendario';
 $labels['importedsuccessfully'] = 'Se ha importado correctamente';
 $labels['switch_calendar'] = 'Cambiar de calendario';
 $labels['user'] = 'Usuarios';
 $labels['cal_user'] = 'Usuario del calendario';
 $labels['submit'] = 'Aceptar';
-$labels['filter_events'] = 'Filtro de eventos';
 $labels['filter'] = 'Filtros';
 $labels['allevents'] = 'todos los eventos';
-$labels['removefilters'] = 'Eliminar filtros';
+$labels['defaultcategorylabel'] = 'Etiqueta de calendario predeterminado';
 $labels['defaultcategory'] = 'Predeterminado';
+$labels['backgroundcolor'] = 'color de fondo';
 $labels['general'] = 'General';
 $labels['schedule'] = 'Programación';
 $labels['every'] = 'Cada';
@@ -193,8 +200,10 @@ $labels['importconfirmation'] = 'Desea importar el(los) evento(s) adjunto(s) en 
 $labels['item'] = 'Ítem';
 $labels['errorsaving'] = 'Ocurrió un error mientras se guardaba';
 $labels['calreadonly'] = 'Éste calendario es de sólo lectura';
-$labels['mycalendar'] = 'Mi Calendario';
 $labels['allcalendars'] = 'Todos los Calendarios';
+$labels['subscriptions'] = 'Suscripciones';
+$labels['feed'] = 'Feed';
+$labels['caldav'] = 'CalDAV';
 $labels['protected'] = 'Protegido';
 $labels['calsearch'] = 'Resultados de la Búsqueda';
 $labels['calsearchnomatches'] = 'Ninguna coincidencia';
@@ -239,6 +248,7 @@ $labels['editfuture'] = 'Solo este y los siguiente eventos';
 $labels['applyrecurring'] = 'Aplicar los cambios a...';
 $labels['birthday'] = 'Cumpleaños';
 $labels['happybirthday'] = 'Enhorabuena, Feliz cumpleaños!';
+$labels['submenuprefix'] = '» ';
 $labels['undefined'] = '---';
 
 ?>

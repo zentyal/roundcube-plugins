@@ -1,5 +1,5 @@
 VERSION                COMMENT
---------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 3.0                    - Moved advanced features to carddav_plus plugin
 3.1                    - Fixed a carddav_addressbook.php :: set_filter
                          (*) check if value is array
@@ -21,3 +21,26 @@ VERSION                COMMENT
 4.0.1                  - Redundantcode removed
 5.0                    - Detect, delete and create collections
 5.0.1                  - Sanitize url for MKCOL request
+5.1                    - Roundcube 0.9 compatibility
+5.2                    - Don't recreate deleted CardDAV addressbooks
+5.3                    - Fixed sort order bug
+5.3.1                  - Fixed "SERVICE CURRENTLY NOT AVAILABLE! Addressbook source (null) not found!" bug
+5.3.2                  - Disallow creating contacts without email address (same behavior as default addressbooks)
+5.3.3                  - DAViCal needs header Depth: 1 for PROPFIND requests to return addresses
+5.3.4                  - Don't try to write into automatic addressbook if $CONTACTS is no object of
+                         method 'insert' does not exist
+5.3.5                  - Support for carddav_plus advanced search
+5.3.6                  - Bug fix: some fields for advanced search didn't work
+5.3.7                  - Advanced search contact sort order according to settings
+5.3.8                  - Implemented 'addressbook_search_mode' for quick/advanced search
+                         (still missing for autocomplete - that's next)
+5.3.9                  - Implemented 'addressbook_search_mode' for autocompletion
+5.3.10                 - Fixed bug: PHP Fatal error:  Cannot access protected property rcube_db_mysql::$db_error
+                         in ./plugins/carddav/carddav_addressbook.php on line 1408
+5.3.11                 - Added database sequences to config.inc.php.dist (PostgreSQL)
+5.4                    - Implemented database versioning
+5.4.1                  - Display phote in message view
+5.4.2 - 5.4.3          - Do not replace underscore in URLs
+5.4.4                  - Load carddav_plus automatically if available
+5.4.5                  - Accept upercase in CardDAV URLs
+5.4.6 - 5.4.7          - GUI improvements

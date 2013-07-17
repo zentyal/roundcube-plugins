@@ -95,7 +95,7 @@ class carddav_backend
 	 *
 	 * @constant string
 	 */
-	const VERSION = '5.0';
+	const VERSION = '5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3';//5.0';
 
 	/**
 	 * User agent displayed in http requests
@@ -161,13 +161,6 @@ class carddav_backend
 	private $vcard_id_chars = array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F');
 
 	/**
-	 * Failsafe Id
-	 *
-	 * @var boolean
-	 */
-  private $failsafe_id = null;
-
-	/**
 	 * Current id for the running request
 	 *
 	 * @var string
@@ -189,13 +182,6 @@ class carddav_backend
 	private $ext = '.vcf';
 
 	/**
-	 * Sleep after PUT request instead of waiting for response
-	 *
-	 * @var integer
-	 */
-	private $sleep = null;
-
-	/**
 	 * Constructor
 	 * Sets the CardDAV server url
 	 *
@@ -204,13 +190,11 @@ class carddav_backend
 	 * @param boolean $wait 
 	 * @return	void
 	 */
-	public function __construct($url = null, $ext = 'vcf', $sleep = null, $failsafe_id = true)
+	public function __construct($url = null, $ext = 'vcf')
 	{
 		if ($url !== null)
 		{
 			$this->set_url($url);
-			$this->sleep = $sleep;
-			$this->failsafe_id = $failsafe_id;
 			if(class_exists('carddav_plus')){
 			  $this->ext = carddav_plus::carddav_ext($url, $ext);
 			}
@@ -256,11 +240,12 @@ class carddav_backend
 	 */
 	public function get($include_vcards = true, $raw = false)
 	{
-    $content = '<?xml version="1.0" encoding="utf-8" ?><D:sync-collection xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav"><D:sync-token></D:sync-token><D:prop><D:getcontenttype/><D:getetag/><D:allprop/><C:address-data><C:allprop/></C:address-data></D:prop><C:filter/></D:sync-collection>';
+    //Davical ??? https://github.com/graviox/Roundcube-CardDAV/issues/29
+    /*$content = '<?xml version="1.0" encoding="utf-8" ?><D:sync-collection xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav"><D:sync-token></D:sync-token><D:prop><D:getcontenttype/><D:getetag/><D:allprop/><C:address-data><C:allprop/></C:address-data></D:prop><C:filter/></D:sync-collection>';
     $content_type = 'application/xml';
     $this->headers = array('Depth: 1');
-    //$response = $this->query($this->url, 'REPORT', $content, $content_type);
-		
+    $response = $this->query($this->url, 'REPORT', $content, $content_type);*/
+    $this->headers = array('Depth: 1');
     //if(!$response){
       $response = $this->query($this->url, 'PROPFIND');
     //}
@@ -679,7 +664,6 @@ class carddav_backend
       $auth = $this->auth_method[$protocol . $host . $port];
       $username = $this->username;
       $password = $this->password;
-      $sleep = $this->sleep;
       $current_id = $this->current_id;
       $ret = carddav_plus::carddav_put(
         $protocol,
@@ -694,7 +678,6 @@ class carddav_backend
         $content_type,
         $content,
         $return_boolean,
-        $sleep,
         $current_id
       );
       if($ret){
@@ -791,9 +774,6 @@ class carddav_backend
 		
 		$this->current_id = $id;
 		
-		if(!$this->failsafe_id){
-		  return $id;
-		}
 		$carddav = new carddav_backend($this->url);
 		$carddav->set_auth($this->username, $this->password);
 

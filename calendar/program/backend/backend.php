@@ -6,10 +6,12 @@ abstract class Backend
    * Search Events
    *
    * @param  string Search string
+   * @param  string Label for default category
    * @access public
    */
   abstract public function searchEvents(
-    $str
+    $str,
+    $label
   );
   
   /**
@@ -144,6 +146,19 @@ abstract class Backend
     $uid=false,
     $client=false
   );
+  
+  /**
+   * Add a new calendar
+   *
+   * @param  array Account
+   * @param  string Displayname
+   * @param  string Color
+   */
+  abstract public function newCalendar(
+    $account,
+    $displayname,
+    $color
+  );
 
   /**
    * Edit a single event
@@ -236,6 +251,15 @@ abstract class Backend
   );
   
   /**
+   * Delete a calendar
+   *
+   * @param  array Account
+   */
+  abstract public function removeCalendar(
+    $account
+  );
+  
+  /**
    * Remove all events from the database
    * 
    * @param  integer mode: 0 = truncate, 1 = set del flag, 2 = restore
@@ -308,12 +332,5 @@ abstract class Backend
   abstract public function getEventsByUID(
     $uid
   );
-   
-  /**
-   * Check database access
-   * 
-   * @access public
-   */  
-  abstract public function test(); 
 }
 ?>

@@ -48,13 +48,13 @@ a.addbutton {
 #addressbooktoolbar a.carddavsync {
   background-image: url('sync.png');
   background-repeat: no-repeat;
-  background-position: center 7px;
+  background-position: center 2px;
 }
 
 #addressbooktoolbar a.carddavloading {
   background-image: url('loading.gif');
   background-repeat: no-repeat;
-  background-position: center 7px;
+  background-position: center 2px;
 }
 
 .carddav .button {

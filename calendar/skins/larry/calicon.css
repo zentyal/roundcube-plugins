@@ -2,6 +2,10 @@ input.protected_category {
   background-color: #B9C4F2;
 }
 
+select.invimportcategory {
+  font-size: 11px;
+}
+
 #taskbar a:hover span.button-inner{
   color: #3cf;
   background-color: #2c2c2c;

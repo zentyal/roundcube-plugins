@@ -6,8 +6,15 @@ $(document).ready(function() {
     $('#calendar_button').children().attr('style', 'color: #3CF; background-color: #2c2c2c;');
   }
   
+  /* minimalmode */
+  $(window).resize(function(){
+    calendar_gui.minimalmode();
+  });
+  
   /* reload calendar */
   rcmail.addEventListener('plugin.reloadCalendar', reloadCalendar);
+  
+  rcmail.addEventListener('plugin.syncCalendar', calendar_commands.reload);
   
   /* unlock GUI */
   rcmail.addEventListener('plugin.calendar_unlockGUI', unlockGUI);
@@ -78,7 +85,7 @@ $(document).ready(function() {
       if(rcmail.env.skin == 'larry'){
         fudge = 85;
       }
-      var approxheight = Math.max(50 + ((i+1) * tr), fudge);
+      var approxheight = Math.max(75 + ((i+1) * tr), fudge);
       $("#calsearchdialog").dialog('option','height',Math.min(maxheigth,approxheight));
       if(response.filters.length > 0){
         $('#cal_search_field_categories').attr('checked',false);
@@ -123,7 +130,6 @@ $(document).ready(function() {
     /* Template objects */
     $('#cal_boxtitle').html(response.settings['boxtitle'].content);
     $('#calusers').html(response.settings['usersselector'].content);
-    $('#calfilterscontainer').html(response.settings['filtersselector'].content);
     $('#categories_html').html(response.settings['categorieshtml']);
 
     /* init Navigation Datepicker */
@@ -151,7 +157,6 @@ $(document).ready(function() {
         //$('.fc-agenda-allday').height($('.fc-agenda-allday').height(""));
         //setTimeout("$('.fc-agenda-allday').height($('.fc-agenda-allday').height() + 3);",1000)
         calendar_gui.init(response);
-        $('#toolbar').show();
         $('#jqdatepicker').datepicker('setDate', $('#calendar').fullCalendar('getDate'));
         $('#upcoming').fullCalendar('addEventSource',$('#calendar').fullCalendar('clientEvents'));
         $('#upcoming').fullCalendar('gotoDate', $('#calendar').fullCalendar('getDate'));
@@ -195,6 +200,7 @@ $(document).ready(function() {
         calendar_callbacks.viewDisplay(view, response);
       },
       loading : function(isLoading){
+        calendar_gui.minimalmode();
         rcmail.env.calendar_msgid = calendar_callbacks.loading(isLoading, rcmail.env.calendar_msgid);
         calendar_callbacks.loading(isLoading, rcmail.env.calendar_msgid);
       },

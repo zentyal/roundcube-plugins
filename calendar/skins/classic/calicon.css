@@ -6,6 +6,10 @@ input.protected_category {
   background-color: #B9C4F2;
 }
 
+select.invimportcategory {
+  font-size: 11px;
+}
+
 #caltoday,
 #calback,
 #calforward {

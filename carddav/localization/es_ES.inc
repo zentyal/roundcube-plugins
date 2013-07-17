@@ -7,7 +7,7 @@
  | Copyright (C) 2010-2013, Roland 'rosali' Liebl
  |
  +-----------------------------------------------------------------------+
- | Author: Yoni - 02/19/2013 03:00:22
+ | Author: Yoni - 04/23/2013 08:42:56
  +-----------------------------------------------------------------------+
 */
 
@@ -72,6 +72,7 @@ $labels['local'] = 'local';
 $labels['fe'] = 'p.e.';
 $labels['googlecaptcha'] = 'Permitir acceso a tu cuenta de Google';
 $labels['clickhere'] = 'Haga clic aquí';
+$labels['submenuprefix'] = '» ';
 $labels['blank'] = ' ';
 
 ?>

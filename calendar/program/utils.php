@@ -8,7 +8,7 @@ class Utils
   public function __construct($rcmail, $backend='dummy') {
     $this->rcmail = $rcmail;
     $this->backend = $backend;
-    $this->categories = array_merge((array)$rcmail->config->get('public_categories',array()),(array)$rcmail->config->get('categories',array()));
+    $this->categories = array_merge((array)$rcmail->config->get('categories',array()), (array)$rcmail->config->get('public_categories',array()));
   }
   /**
    * Flatten an array
@@ -40,7 +40,7 @@ class Utils
    * @return array
    * @access public
    */
-  public function eventArrayMap($event,$category=false){
+  public function eventArrayMap($event, $category=false){
     if(!$ctz = get_input_value('_tz', RCUBE_INPUT_GET)){
       $ctz = calendar::getClientTimezoneName($this->rcmail->config->get('timezone', 'auto'));
     }
@@ -63,15 +63,17 @@ class Utils
       $event['end'] = $event['end'] + $offset;
     if($event['clone'])
       $event['clone'] = $event['clone'] + $cloneoffset;
-
     if(isset($_GET['_from'])){
       $user = $this->getUser(get_input_value('_from', RCUBE_INPUT_GPC));
       $prefs = unserialize($user['preferences']);
-      if(isset($prefs['categories'])){
-        $this->categories = $prefs['categories'];
+      if(!is_array($prefs['categories'])){
+        $prefs['categories'] = $this->rcmail->config->get('categories', array());
       }
+      if(!is_array($prefs['public_categories'])){
+        $prefs['public_categories'] = $this->rcmail->config->get('public_categories', array());
+      }
+      $this->categories = array_merge($prefs['categories'], $prefs['public_categories']);
     }
-    $this->categories = array_merge($this->rcmail->config->get('public_categories',array()),$this->categories);
     if(!$category)
       $category = $event['categories'];
     $colors = $this->categories[$category];
@@ -272,8 +274,8 @@ class Utils
     $vcalendar->parse($cal);
     $stz = date_default_timezone_get();
     $ctz = calendar::getClientTimezoneName($this->rcmail->config->get('timezone', 'auto'));
-    date_default_timezone_set($ctz);
     while($vevent = $vcalendar->getComponent("vevent")){
+      date_default_timezone_set($ctz);
       $items ++;
       if($item){
         if($item != $items){
@@ -284,6 +286,9 @@ class Utils
       if(is_array($vevent->dtstart)){
         if($vevent->dtstart['params']['VALUE'] == 'DATE'){
           $xevent['ALLDAY'] = true;
+        }
+        if($vevent->dtstart['params']['TZID']){
+          date_default_timezone_set($vevent->dtstart['params']['TZID']);
         }
         $val = implode('', $vevent->dtstart['value']);
         if($ts = strtotime($val)){
@@ -299,6 +304,9 @@ class Utils
             $remindermailto = false;
             $reminderbefore = 0;
             if(is_array($vevent->dtend)){
+              if($vevent->dtend['params']['TZID']){
+                date_default_timezone_set($vevent->dtend['params']['TZID']);
+              }
               $val = implode('', $vevent->dtend['value']);
               $xevent['DTEND'] = strtotime($val);
             }
@@ -317,10 +325,15 @@ class Utils
             if(is_array($vevent->categories)){
               $xevent['CATEGORIES'] = $vevent->categories[0]['value'];
             }
-            if(!$className)
+            if($className === '0'){
+              $dbClassName = null;
+            }
+            else if(!$className){
               $dbclassName = $xevent['CATEGORIES'];
-            else
+            }
+            else{
               $dbclassName = $className;
+            }
             if(is_array($vevent->uid)){
               $xevent['UID'] = $vevent->uid['value'];
             }
@@ -460,7 +473,8 @@ class Utils
                 $remindertype,
                 $remindermailto,
                 array('uid' => $xevent['UID'], 'href' => $href, 'etag' => $etag),
-                $client
+                $client,
+                false
               );
             }
             else{
@@ -529,10 +543,6 @@ class Utils
           }
         }
       }
-      $ical = "BEGIN:VCALENDAR\n";
-      $ical .= "VERSION:2.0\n";
-      $ical .= "PRODID:-//" . $rcmail->config->get('product_name') . "//NONSGML Calendar//EN\n";
-      $ical .= "X-WR-Timezone: Europe/London\n";
       $stz = date_default_timezone_get();
       if($_SESSION['tzname'])
         $tz = $_SESSION['tzname'];
@@ -542,7 +552,79 @@ class Utils
         $tz = get_input_value('_tz', RCUBE_INPUT_GPC);
       else
         $tz = $stz;
-      date_default_timezone_set($tz);
+      if($rcmail->config->get('timezone') != 'auto'){
+        $ctz = $rcmail->config->get('timezone');
+      }
+      else{
+        $ctz = $tz;
+      }
+      date_default_timezone_set($ctz);
+      $ical = "BEGIN:VCALENDAR\n";
+      $ical .= "VERSION:2.0\n";
+      $ical .= "PRODID:-//" . $rcmail->config->get('product_name') . "//NONSGML Calendar//EN\n";
+      $use_utc = true;
+      if(count($events) == 1){
+        $use_utc = false;
+        $tz = new DateTimeZone($ctz);
+        $transitions = $tz->getTransitions(strtotime(date('Y', $events[0]['start']) . '0101T000000Z'));
+        if(isset($transitions[1])){
+          if($transitions[1]['isdst']){
+            $dst = 1;
+            $st  = 2;
+          }
+          else{
+            $st  = 1;
+            $dst = 2;
+          }
+        }
+        else{
+          $st = 0;
+        }
+        foreach($transitions as $idx => $props){
+          if($idx == 0) continue;
+          if($props['isdst']){
+            if(date('j', $props['ts']) < 16){
+              $dst_l = '1';
+            }
+            else{
+              $dst_l = '-1';
+            }
+            $dst_d = strtoupper(substr(date('D', $props['ts']), 0, 2));
+            $dst_m = date('m', $props['ts']);
+          }
+          else{
+            if(date('j', $props['ts']) < 16){
+              $st_l = '1';
+            }
+            else{
+              $st_l = '-1';
+            }
+            $st_d = strtoupper(substr(date('D', $props['ts']), 0, 2));
+            $st_m = date('m', $props['ts']);
+          }
+        }
+        $ical .= "BEGIN:VTIMEZONE\n";
+        $ical .= "TZID:$ctz\n";
+        if(!empty($dst)){
+          $ical .= "BEGIN:DAYLIGHT\n";
+          $ical .= "DTSTART:" . date('Ymd\THis\Z', $transitions[1]['ts']) . "\n";
+          $ical .= "RRULE:FREQ=YEARLY;BYDAY=" . $dst_l . $dst_d . ";BYMONTH=" . $dst_m . "\n";
+          $ical .= "TZNAME:" . $transitions[$dst]['abbr'] . "\n";
+          $ical .= "TZOFFSETFROM:" . date('O', $transitions[$st]['ts']) . "\n";
+          $ical .= "TZOFFSETTO:" . date('O', $transitions[$dst]['ts']) . "\n";
+          $ical .= "END:DAYLIGHT\n";
+        }
+        $ical .= "BEGIN:STANDARD\n";
+        $ical .= "DTSTART:" . date('Ymd\THis\Z', $transitions[2]['ts']) . "\n";
+        if(!empty($dst)){
+          $ical .= "RRULE:FREQ=YEARLY;BYDAY=" . $st_l . $st_d . ";BYMONTH=" . $st_m . "\n";
+        }
+        $ical .= "TZNAME:" . $transitions[$st]['abbr'] . "\n";
+        $ical .= "TZOFFSETFROM:" . date('O', $transitions[$dst]['ts']) . "\n";
+        $ical .= "TZOFFSETTO:" . date('O', $transitions[$st]['ts']) . "\n";
+        $ical .= "END:STANDARD\n";
+        $ical .= "END:VTIMEZONE\n";
+      }
       foreach ($events as $event) {
         if(($event['del'] != 1 || $showdel) && (!$event['clone'] || $showclone)){
           $ical .= "BEGIN:VEVENT\n";
@@ -561,15 +643,35 @@ class Utils
             }
           }
           else if($event['clone']){
-            $ical .= "DTSTART:" . gmdate('Ymd\THis\Z',$event['clone']) . "\n";
+            if($use_utc){
+              $ical .= "DTSTART:" . gmdate('Ymd\THis\Z',$event['clone']) . "\n";
+            }
+            else{
+              $ical .= "DTSTART;TZID=$ctz:" . date('Ymd\THis',$event['clone']) . "\n";
+            }
             if($event['clone'] != $event['clone_end']) {
-              $ical .= "DTEND:" . gmdate('Ymd\THis\Z',$event['clone_end']) . "\n";
+              if($use_utc){
+                $ical .= "DTEND:" . gmdate('Ymd\THis\Z',$event['clone_end']) . "\n";
+              }
+              else{
+                $ical .= "DTEND;TZID=$ctz:" . date('Ymd\THis',$event['clone_end']) . "\n";
+              }
             }
           }
           else{
-            $ical .= "DTSTART:" . gmdate('Ymd\THis\Z',$event['start']) . "\n";
+            if($use_utc){
+              $ical .= "DTSTART:" . gmdate('Ymd\THis\Z',$event['start']) . "\n";
+            }
+            else{
+              $ical .= "DTSTART;TZID=$ctz:" . date('Ymd\THis',$event['start']) . "\n";
+            }
             if($event['start'] != $event['end']) {
-              $ical .= "DTEND:" . gmdate('Ymd\THis\Z',$event['end']) . "\n";
+              if($use_utc){
+                $ical .= "DTEND:" . gmdate('Ymd\THis\Z',$event['end']) . "\n";
+              }
+              else{
+                $ical .= "DTEND;TZID=$ctz:" . date('Ymd\THis',$event['end']) . "\n";
+              }
             }
           }
           $freq = $this->rrule($event);
@@ -664,7 +766,7 @@ class Utils
             $ical .= 'BEGIN:VALARM' . "\n";
             $ical .= 'ACTION:DISPLAY' . "\n";
             if($event['summary']) {
-              $ical .= 'DESCRITION:' . $event['summary'] . "\n";
+              $ical .= 'DESCRIPTION:' . $event['summary'] . "\n";
             }
             else if($event['description']){
               $ical .= 'DESCRIPTION:' . $event['description'] . "\n";
@@ -700,6 +802,34 @@ class Utils
         }
       }
       $ical .= "END:VCALENDAR";
+/*$ical = 'BEGIN:VCALENDAR
+PRODID:-//Roundcube//NONSGML Calendar//EN\n";
+VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:DAYLIGHT
+DTSTART:20000404T020000
+RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
+TZNAME:EDT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20001026T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZNAME:EST
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:' . gmdate('Ymd\THis\Z',time()) . '
+DTSTART;TZID=America/New_York:20130522T140000
+DTEND;TZID=America/New_York:20130522T150000
+SUMMARY:Event #2 bis
+UID:' . md5(time()) . '@example.com
+END:VEVENT
+END:VCALENDAR';*/
       date_default_timezone_set($stz);
       return $ical;
     }
@@ -793,11 +923,14 @@ class Utils
   public function arrayEvents($start, $end, $category=false, $edit=true, $links=false, $returndel=false, $events=false, $client=false) {
     $rcmail = $this->rcmail;
     $public_caldavs = $rcmail->config->get('public_caldavs', array());
-    foreach($public_caldavs as $category => $caldav){
+    foreach($public_caldavs as $cat => $caldav){
       $public_caldavs[$category]['pass'] = $rcmail->encrypt($caldav['pass']);
     }
     $protected = false;
     $read = false;
+    if(isset($public_caldavs[$category]['user']) && strtolower($public_caldavs[$category]['user']) != strtolower($rcmail->user->data['username'])){
+      $protected = true;
+    }
     $caldavs = array_merge($rcmail->config->get('caldavs', array()), $public_caldavs);
     if($url = $caldavs[$category]['url']){
       $url = explode('?', $url, 2);
@@ -907,14 +1040,15 @@ class Utils
       $fontcolor = substr(dechex(~hexdec($color)),-6);
     }
     else{
-      $r = substr($color,0,2);
-      $g = substr($color,3,2);
-      $b = substr($color,5,2);
-      if ( $r <= "99" && $g <= "99" && $b <= "99"){
-        $fontcolor='FFFFFF';
+      $c_r = hexdec(substr($color, 0, 2));
+      $c_g = hexdec(substr($color, 2, 2));
+      $c_b = hexdec(substr($color, 4, 2));
+      $brightness = (($c_r * 299) + ($c_g * 587) + ($c_b * 114)) / 1000;
+      if($brightness > 130){
+        $fontcolor = '000000';
       }
-      else {
-        $fontcolor='000000';
+      else{
+        $fontcolor = 'FFFFFF';
       }
     }
     return $fontcolor;
